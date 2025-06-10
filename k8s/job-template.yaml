@@ -1,0 +1,84 @@
+apiVersion: batch/v1
+kind: Job 
+metadata:
+  name: job_name # placeholder: this will be replaced with the datajoint key when executing
+spec:
+  parallelism: 1 # Don't want to run the same key twice in parallel
+  template:
+    spec:
+      restartPolicy: OnFailure
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+      hostNetwork: true # Allow the pod to use the host network for internet access
+      affinity: 
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/role
+                operator: NotIn # Key must not be in the following:
+                values:
+                - control-plane
+              - key: kubernetes.io/hostname
+                operator: NotIn
+                values: 
+                - jr-compute002
+                - jr-compute004
+      containers:
+      - name: container_name # placeholder: is programmatically replaced with value from table
+        image: image_url # placeholder
+        resources:
+          requests:
+            cpu: n_cpu # placeholder
+            memory: memory # placeholder
+            nvidia.com/gpu: n_gpu # placeholder
+          limits:
+            memory: mem_limit # placeholder
+            nvidia.com/gpu: gpu_limit # placeholder
+        env:
+        - name: MY_NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: DJ_PASS
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: DJ_PASS
+        - name: DJ_USER
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: DJ_USER
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: AWS_ACCESS_KEY
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: AWS_SECRET_KEY
+        - name: GITHUB_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: GITHUB_TOKEN
+        command: ["/bin/bash"]
+        args: ["-c", 
+          "git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_h01.git &&\
+          export PYTHONPATH=/home/neurd/workspace/connects_h01:$ &&\
+          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/neurd_aws_pipeline_runner.git &&\
+          cd /home/neurd/workspace/connects_h01/plumbing &&\
+          python3 plumbing.py"] 

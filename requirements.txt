@@ -1,0 +1,4 @@
+boto3
+kubernetes
+eks_token
+datajoint>=0.14.3
