@@ -6,8 +6,8 @@
 - Some limited monitoring capabilities
 
 ## Installation
-`pip install +git https://github.com/reimerlab/connects_aws_pipeline_runner.git`
+`pip install git+https://github.com/reimerlab/connects_aws_pipeline_runner.git`
 
 ## To run H01 segments on the `neurd-dev` AWS EKS cluster
 1. Obtain credentials and save in `k8s/populate-service-credentials.yaml`
-2. Run `python run_neurd_pipeline.py [segment1, segment2, ...]`
+2. From scripts directory, run `python run_neurd_pipeline.py [segment1, segment2, ...]`
