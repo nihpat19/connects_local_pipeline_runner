@@ -15,7 +15,6 @@ def run_segments(segment_ids):
     plumbing.Jobs.Launched.populate(hashed_keys)
     to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     while to_do:
-        clear_output(wait = True)
         n_assigned = len((plumbing.Jobs & 'scheme = "connects-aws"') * plumbing.Jobs.JobAssignment() & hashed_keys)
         n_complete = len((plumbing.Jobs & 'scheme = "connects-aws"') * plumbing.Jobs.Complete() & hashed_keys)
         n_launched = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
@@ -25,6 +24,7 @@ def run_segments(segment_ids):
         print("Do not exit until queue/ready is empty.")
         plumbing.Jobs.Launched.populate(to_do)
         time.sleep(20)
+        delete_multiple_lines(n=7)
         to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     
     print('Done.')
@@ -56,6 +56,12 @@ def check_segments_against_jobs_table(segment_id):
         if j['key']['segment_id'] == segment_id:
             matching_jobs.append({'table_name': j['table_name'], 'key_hash':j['key_hash']})
     return hp.schema.jobs & matching_jobs
+
+def delete_multiple_lines(n=1):
+    """Delete the last line in the STDOUT."""
+    for _ in range(n):
+        sys.stdout.write("\x1b[1A")  # cursor up one line
+        sys.stdout.write("\x1b[2K")  # delete the last line
 
 if __name__ == "__main__":
     segment_ids = [int(arg) for arg in sys.argv[1:]]

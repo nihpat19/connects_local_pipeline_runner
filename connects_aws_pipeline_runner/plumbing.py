@@ -295,7 +295,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
 
 def load_job_template():
     import yaml
-    with open("k8s/job-template.yaml") as stream:
+    with open("../k8s/job-template.yaml") as stream:
         try:
             return yaml.safe_load(stream)
         except yaml.YAMLError as exc:
