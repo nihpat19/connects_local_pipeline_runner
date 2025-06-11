@@ -7,6 +7,7 @@ slp = dj.create_virtual_module('plumbingtest', 'plumbingtest')
 key = {"sleep_time": 10}
 hashed_key = Keys().include(key)
 
+# delete keys and repopulate
 (plumbing.Jobs.JobAssignment() & hashed_key).delete(force = True)
 plumbing.Jobs().initialize('neurd-dev')
 (plumbing.Jobs() & 'scheme = "test"').assign(hashed_key)

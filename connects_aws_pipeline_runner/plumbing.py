@@ -1,16 +1,13 @@
 import time
 import datajoint as dj
 from datajoint.hash import key_hash as kh
-from . import abstracted
-from . import monitoring
-from . import clusters
-
+from connects_aws_pipeline_runner import abstracted, monitoring, clusters
 schema = dj.Schema("plumbing")
 
 from getpass import getuser
 from importlib import import_module
 import os
-from IPython.display import clear_output
+#from IPython.display import clear_output
 ModularTables = abstracted.ModularTables
 Keys = abstracted.Keys
 ResourceMonitorSimple = monitoring.ResourceMonitorSimple
@@ -262,6 +259,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
 
     def initialize(self, cluster, scheme = 'test', monitor = 'simple', resource_model = 'test'):
         self.insert1({'scheme': scheme, 'monitor_name':monitor, 'cluster_name' : cluster, 'model_name' : resource_model}, skip_duplicates = True)
+        load_secret(cluster)
         #TODO: spin up EKS nodes
     
     # populate up to JobAssignment
@@ -279,7 +277,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
     def run(self):
         to_do = self * (self.Ready() - self.Complete())
         while to_do:
-            clear_output(wait = True)
+            #clear_output(wait = True)
             n_assigned = len(self.JobAssignment())
             n_complete = len(self.Complete())
             n_launched = len(self.Launched() - self.Complete())
@@ -298,6 +296,23 @@ def load_job_template():
     with open("../k8s/job-template.yaml") as stream:
         try:
             return yaml.safe_load(stream)
+        except yaml.YAMLError as exc:
+            print(exc)
+
+def load_secret(cluster, verbose = False):
+    import yaml
+    with open("../k8s/populate-service-credentials.yaml") as stream:
+        try:
+            body = yaml.safe_load(stream)
+            api = (clusters.Cluster() & f"cluster_name = '{cluster}'").core_api
+            try:
+                response = api.read_namespaced_secret('populate-service-credentials', 'default')
+            except:
+                response = api.create_namespaced_secret('default', body)
+
+            if verbose:
+                print(response)
+
         except yaml.YAMLError as exc:
             print(exc)
 

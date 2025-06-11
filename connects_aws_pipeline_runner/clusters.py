@@ -5,6 +5,7 @@ https://medium.com/@aris.david/how-to-create-a-job-using-kubernetes-python-clien
 
 import datajoint as dj
 import logging
+from pathlib import Path
 logging.basicConfig(level=logging.INFO)
 try:
     import kubernetes
@@ -104,14 +105,14 @@ class Cluster(dj.Lookup):
         token, endpoint, cert_authority_data = self.get_eks_credentials(cluster_name, region)
         _client = kubernetes.client
         # Save the CA certificate in a temporary file
-        with open('/tmp/ca.crt', 'w') as f:
+        with open(Path('ca.crt'), 'w') as f:
             f.write(base64.b64decode(cert_authority_data).decode('utf-8'))
 
         # Create Kubernetes client configuration using the token and cluster details
         configuration = _client.Configuration()
         configuration.host = endpoint
         configuration.verify_ssl = True
-        configuration.ssl_ca_cert = '/tmp/ca.crt'
+        configuration.ssl_ca_cert = Path('ca.crt')
         configuration.api_key = {"authorization": f"Bearer {token}"}
 
         # Set the configuration for the Kubernetes client
