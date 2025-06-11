@@ -1,2 +1,3 @@
 k8s/populate-service-credentials.yaml
 __pycache__/*
+.venv/*
