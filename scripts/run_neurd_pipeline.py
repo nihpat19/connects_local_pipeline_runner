@@ -6,11 +6,13 @@ import time
 
 hp = dj.create_virtual_module('h01_process', 'h01_process')
 
-def run_segments(segment_ids):
+def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
     keys = [{'segment_id': segment_id} for segment_id in segment_ids]
-    hashed_keys = [Keys.include(key) for key in keys]
+    hashed_keys = [Keys().include(key) for key in keys]
+    if delete_existing_jobs:
+        (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
     (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     plumbing.Jobs.Launched.populate(hashed_keys)

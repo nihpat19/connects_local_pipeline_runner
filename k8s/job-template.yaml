@@ -81,6 +81,7 @@ spec:
           export PYTHONPATH=/home/neurd/workspace/connects_h01:$ &&\
           git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_aws_pipeline_runner.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_aws_pipeline_runner/connects_aws_pipeline_runner:$ &&\
+          echo PYTHONPATH &&\
           cd connects_aws_pipeline_runner &&\
           pip install . &&\
           cd connects_aws_pipeline_runner &&\
