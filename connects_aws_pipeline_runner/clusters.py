@@ -6,7 +6,7 @@ https://medium.com/@aris.david/how-to-create-a-job-using-kubernetes-python-clien
 import datajoint as dj
 import logging
 from pathlib import Path
-logging.basicConfig(level=logging.INFO)
+#logging.basicConfig(level=logging.INFO)
 try:
     import kubernetes
     import boto3
@@ -77,7 +77,6 @@ class Cluster(dj.Lookup):
     @property
     def client(self):
         cluster_name, cluster_mgmt, region = self.fetch1('cluster_name', 'cluster_mgmt', 'region')
-        print(cluster_name)
         if cluster_mgmt == 'bcm':
             return self._set_client_local()
         if cluster_mgmt == 'aws-eks':
