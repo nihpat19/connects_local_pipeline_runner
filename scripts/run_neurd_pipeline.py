@@ -1,7 +1,8 @@
 import datajoint as dj
-from .abstracted import Keys
-from . import plumbing
+from connects_aws_pipeline_runner.abstracted import Keys
+from connects_aws_pipeline_runner import plumbing
 import sys
+import time
 
 hp = dj.create_virtual_module('h01_process', 'h01_process')
 

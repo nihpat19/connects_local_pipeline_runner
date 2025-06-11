@@ -79,6 +79,8 @@ spec:
         args: ["-c", 
           "git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_h01.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_h01:$ &&\
-          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/neurd_aws_pipeline_runner.git &&\
-          cd /home/neurd/workspace/connects_h01/plumbing &&\
+          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_aws_pipeline_runner.git &&\
+          cd connects_aws_pipeline_runner &&\
+          pip install . &&\
+          cd connects_aws_pipeline_runner &&\
           python3 plumbing.py"] 
