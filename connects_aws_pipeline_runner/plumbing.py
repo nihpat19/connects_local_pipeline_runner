@@ -41,8 +41,8 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         ---
         topological_index : int                                # height
         """
-        contents = [['test', 'plumbingtest', 'Sleep', 1],
-                    ['test', 'plumbingtest', 'SleepMemory', 2],
+        contents = [['test', 'sleep', 'Sleep', 1],
+                    ['test', 'sleep', 'SleepMemory', 2],
                     ['connects', 'h01process', 'SomaExtraction', 1],
                     ['connects', 'h01process', 'Decomposition', 2],
                     ['connects', 'h01process', 'DecompositionCellType', 3],
