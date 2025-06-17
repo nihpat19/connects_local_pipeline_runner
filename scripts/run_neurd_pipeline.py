@@ -4,6 +4,8 @@ from connects_aws_pipeline_runner import plumbing
 import sys
 import time
 
+dj.config['safemode'] = False # deletes without prompt
+plumbing.load_secret('neurd-dev')
 hp = dj.create_virtual_module('h01_process', 'h01_process')
 
 def run_segments(segment_ids, delete_existing_jobs = True):
@@ -12,6 +14,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     keys = [{'segment_id': segment_id} for segment_id in segment_ids]
     hashed_keys = [Keys().include(key) for key in keys]
     if delete_existing_jobs:
+        print('deleting existing assigned jobs from plumbing.Jobs.JobAssignment...')
         (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
     (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
@@ -45,7 +48,7 @@ def check_status(segment_id):
             status = f"{n_reserved} reserved splits; {n_errors} error splits"
     else: # check to see if completed
         key = {'segment_id': segment_id}
-        segment_query = hp.AutoProcessedNeuron & key
+        segment_query = hp.AutoProofreadNeuron & key
         if segment_query:
             status = f"complete; {len(segment_query)} splits"
         else:
