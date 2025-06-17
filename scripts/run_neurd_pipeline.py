@@ -16,7 +16,9 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     if delete_existing_jobs:
         print('Deleting existing jobs from plumbing.Jobs.JobAssignment and from the datajoint jobs table. This does not delete kubernetes jobs in the cluster.')
         (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
-        (hp.schema.jobs & keys).delete()
+        query = check_segments_against_jobs_table(segment_ids)
+        query.delete()
+
     (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     plumbing.Jobs.Launched.populate(hashed_keys)
@@ -56,12 +58,16 @@ def check_status(segment_id):
             status = 'unknown' # shouldn't happen
     return status
        
-def check_segments_against_jobs_table(segment_id):
+def check_segments_against_jobs_table(segment_ids):
+    if not isinstance(segment_ids, list):
+        segment_ids = list(segment_ids)
+
     jobs = hp.schema.jobs.fetch(as_dict = True)
     matching_jobs = []
-    for j in jobs:
-        if j['key']['segment_id'] == segment_id:
-            matching_jobs.append({'table_name': j['table_name'], 'key_hash':j['key_hash']})
+    for segment_id in segment_ids:
+        for j in jobs:
+            if j['key']['segment_id'] == segment_id:
+                matching_jobs.append({'table_name': j['table_name'], 'key_hash':j['key_hash']})
     return hp.schema.jobs & matching_jobs
 
 def delete_multiple_lines(n=1):
