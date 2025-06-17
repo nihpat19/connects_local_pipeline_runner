@@ -14,8 +14,9 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     keys = [{'segment_id': segment_id} for segment_id in segment_ids]
     hashed_keys = [Keys().include(key) for key in keys]
     if delete_existing_jobs:
-        print('deleting existing assigned jobs from plumbing.Jobs.JobAssignment...')
+        print('Deleting existing jobs from plumbing.Jobs.JobAssignment and from the datajoint jobs table. This does not delete kubernetes jobs in the cluster.')
         (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
+        (hp.schema.jobs & keys).delete()
     (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     plumbing.Jobs.Launched.populate(hashed_keys)
@@ -33,7 +34,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         delete_multiple_lines(n=7)
         to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     
-    print('Done.')
+    print('Done. Checking error status.')
     for segment_id in segment_ids:
         status = check_status(segment_id)
         print(f'{segment_id}: {status}')
