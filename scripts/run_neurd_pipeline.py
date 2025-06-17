@@ -17,6 +17,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         print('Deleting existing jobs from plumbing.Jobs.JobAssignment and from the datajoint jobs table. This does not delete kubernetes jobs in the cluster.')
         (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
         query = check_segments_against_jobs_table(segment_ids)
+        print(f"Deleting {len(query)} jobs from datajoint jobs table.")
         query.delete()
 
     (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
