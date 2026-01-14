@@ -9,21 +9,19 @@ from pathlib import Path
 #logging.basicConfig(level=logging.INFO)
 try:
     import kubernetes
-    import boto3
-    from eks_token import get_token
 except:
     print("No EKS or kubernetes control plane support.")
 
 import base64
 
-schema = dj.Schema('clusters')
+schema = dj.Schema('nihil_m35clusters')
 
 @schema
 class ClusterManagement(dj.Lookup):
     definition = """
     cluster_mgmt : varchar(32)                                             # Cluster management vendor/service
     """
-    contents = [['bcm'], ['aws-eks']]
+    contents = [['bcm']]
 
 @schema
 class Region(dj.Lookup):
@@ -32,7 +30,7 @@ class Region(dj.Lookup):
     region : varchar(16)                                                   # region ('local' for local clusters)
     """
     contents = [['bcm', 'local'], 
-                ['aws-eks', 'us-east-1']]
+                ]
 
 @schema
 class Image(dj.Lookup):
@@ -41,7 +39,7 @@ class Image(dj.Lookup):
     ---
     tag : varchar(64)                                                      # image tag
     """
-    contents = [['neurd_v2p', 'latest']]
+    contents = [['neurd_v2p', 'minnie35']]
     class Repository(dj.Lookup, dj.Part):
         definition = """                                                   # URLs for pulling docker images
         -> Image
@@ -53,14 +51,14 @@ class Image(dj.Lookup):
             ['neurd_v2p',
             'bcm', 
             'local', 
-            'jr-saltmaster.ad.bcm.edu:5000/neurd_v2p:latest'],
-            ['neurd_v2p',
-              'aws-eks',
-              'us-east-1',
-              '345594566610.dkr.ecr.us-east-1.amazonaws.com/neurd/v2:latest'
+            'jr-saltmaster.ad.bcm.edu:5000/neurd_v2p:minnie35'],
+            # ['neurd_v2p',
+            #   'aws-eks',
+            #   'us-east-1',
+            #   '345594566610.dkr.ecr.us-east-1.amazonaws.com/neurd/v2:latest'
+            #  ]
              ]
-             ]
-    def sync_images():
+    def sync_images(self):
         #TODO: sync all local and eks images
         pass
 
@@ -72,15 +70,16 @@ class Cluster(dj.Lookup):
     -> Region
     """
     contents = [['jrk8s', 'bcm', 'local'],
-                ['neurd-dev', 'aws-eks', 'us-east-1']]
+                #['neurd-dev', 'aws-eks', 'us-east-1']
+                ]
 
     @property
     def client(self):
-        cluster_name, cluster_mgmt, region = self.fetch1('cluster_name', 'cluster_mgmt', 'region')
-        if cluster_mgmt == 'bcm':
-            return self._set_client_local()
-        if cluster_mgmt == 'aws-eks':
-            return self._set_client_remote(cluster_name, region)
+        #cluster_name, cluster_mgmt, region = self.fetch1('cluster_name', 'cluster_mgmt', 'region')
+        #if cluster_mgmt == 'bcm':
+        return self._set_client_local()
+        #if cluster_mgmt == 'aws-eks':
+            #return self._set_client_remote(cluster_name, region)
     # @property
     # def eks_client(self):
 
@@ -100,41 +99,41 @@ class Cluster(dj.Lookup):
         return kubernetes.client.ApiClient(configuration=configuration)
 
 
-    def _set_client_remote(self, cluster_name, region):
-        token, endpoint, cert_authority_data = self.get_eks_credentials(cluster_name, region)
-        _client = kubernetes.client
-        # Save the CA certificate in a temporary file
-        with open(Path('ca.crt'), 'w') as f:
-            f.write(base64.b64decode(cert_authority_data).decode('utf-8'))
-
-        # Create Kubernetes client configuration using the token and cluster details
-        configuration = _client.Configuration()
-        configuration.host = endpoint
-        configuration.verify_ssl = True
-        configuration.ssl_ca_cert = Path('ca.crt')
-        configuration.api_key = {"authorization": f"Bearer {token}"}
-
-        # Set the configuration for the Kubernetes client
-        _client.Configuration.set_default(configuration)
-        configuration = _client.Configuration.get_default_copy()
-        return kubernetes.client.ApiClient(configuration=configuration)
+    # def _set_client_remote(self, cluster_name, region):
+    #     token, endpoint, cert_authority_data = self.get_eks_credentials(cluster_name, region)
+    #     _client = kubernetes.client
+    #     # Save the CA certificate in a temporary file
+    #     with open(Path('ca.crt'), 'w') as f:
+    #         f.write(base64.b64decode(cert_authority_data).decode('utf-8'))
+    #
+    #     # Create Kubernetes client configuration using the token and cluster details
+    #     configuration = _client.Configuration()
+    #     configuration.host = endpoint
+    #     configuration.verify_ssl = True
+    #     configuration.ssl_ca_cert = Path('ca.crt')
+    #     configuration.api_key = {"authorization": f"Bearer {token}"}
+    #
+    #     # Set the configuration for the Kubernetes client
+    #     _client.Configuration.set_default(configuration)
+    #     configuration = _client.Configuration.get_default_copy()
+    #     return kubernetes.client.ApiClient(configuration=configuration)
         #return _client
 
 
-    def get_eks_credentials(self, cluster_name, region):
-        """Get EKS token, endpoint, and certificate authority data."""
-        session = boto3.Session()
-        eks_client = session.client("eks", region_name=region)
-
-        # Get cluster info (API server endpoint and certificate authority data)
-        cluster_info = eks_client.describe_cluster(name=cluster_name)["cluster"]
-        endpoint = cluster_info["endpoint"]
-        cert_authority_data = cluster_info["certificateAuthority"]["data"]
-
-        # Get authentication token using the eks_token
-        token = get_token(cluster_name=cluster_name)['status']['token']
-
-        return token, endpoint, cert_authority_data
+    # def get_eks_credentials(self, cluster_name, region):
+    #     """Get EKS token, endpoint, and certificate authority data."""
+    #     session = boto3.Session()
+    #     eks_client = session.client("eks", region_name=region)
+    #
+    #     # Get cluster info (API server endpoint and certificate authority data)
+    #     cluster_info = eks_client.describe_cluster(name=cluster_name)["cluster"]
+    #     endpoint = cluster_info["endpoint"]
+    #     cert_authority_data = cluster_info["certificateAuthority"]["data"]
+    #
+    #     # Get authentication token using the eks_token
+    #     token = get_token(cluster_name=cluster_name)['status']['token']
+    #
+    #     return token, endpoint, cert_authority_data
 
 
     def create_namespace(self, namespace):

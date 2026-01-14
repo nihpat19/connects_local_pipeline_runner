@@ -1,12 +1,12 @@
 import datajoint as dj
-from connects_aws_pipeline_runner.abstracted import Keys
-from connects_aws_pipeline_runner import plumbing
+from connects_local_pipeline_runner.abstracted import Keys
+from connects_local_pipeline_runner import plumbing
 import sys
 import time
 
 dj.config['safemode'] = False # deletes without prompt
-plumbing.load_secret('neurd-dev')
-hp = dj.create_virtual_module('h01_process', 'h01_process')
+plumbing.load_secret('jrk8s')
+hp = dj.create_virtual_module('nihil_minnie35_process', 'nihil_minnie35_process')
 
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
@@ -20,22 +20,22 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         print(f"Deleting {len(query)} jobs from datajoint jobs table.")
         query.delete()
 
-    (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
+    (plumbing.Jobs() & 'scheme = "connects"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     plumbing.Jobs.Launched.populate(hashed_keys)
-    to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
+    to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     while to_do:
-        n_assigned = len((plumbing.Jobs & 'scheme = "connects-aws"') * plumbing.Jobs.JobAssignment() & hashed_keys)
-        n_complete = len((plumbing.Jobs & 'scheme = "connects-aws"') * plumbing.Jobs.Complete() & hashed_keys)
-        n_launched = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
-        n_ready = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
-        n_queued = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
+        n_assigned = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.JobAssignment() & hashed_keys)
+        n_complete = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.Complete() & hashed_keys)
+        n_launched = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
+        n_ready = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
+        n_queued = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
         print(f'Jobs progress: \n {n_assigned} assigned \n {n_queued} queued \n {n_ready} ready \n {n_launched} launched \n {n_complete} complete (including errors)')
         print("Do not exit until queue/ready is empty.")
         plumbing.Jobs.Launched.populate(to_do)
         time.sleep(20)
         delete_multiple_lines(n=7)
-        to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
+        to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     
     print('Done. Checking error status.')
     for segment_id in segment_ids:

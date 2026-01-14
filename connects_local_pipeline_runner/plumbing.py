@@ -1,8 +1,8 @@
 import time
 import datajoint as dj
 from datajoint.hash import key_hash as kh
-from connects_aws_pipeline_runner import abstracted, monitoring, clusters
-schema = dj.Schema("plumbing")
+from connects_local_pipeline_runner import abstracted, monitoring, clusters
+schema = dj.Schema("nihil_m35plumbing")
 
 from getpass import getuser
 from importlib import import_module
@@ -21,19 +21,17 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
     width : smallint                                           # largest antichain of tables that can be processed in parallel for a given base key, assuming no key splits
     """
     contents = [['connects', 4, 1],
-                ['connects-aws', 4, 1],
+                #['connects-aws', 4, 1],
                 ['test', 2, 1]]
-    def generate_scheme_from_ERD():
-        pass
     class DataBase(dj.Lookup, dj.Part):    
         definition = """ # Database where tables live
         -> JobScheme
         ---
         database_url : varchar(255)
         """
-        contents = [['connects', "neurd-datajoint.cluster-cjc6cqmcqirl.us-east-1.rds.amazonaws.com"],
-                    ['connects-aws', "neurd-datajoint.cluster-cjc6cqmcqirl.us-east-1.rds.amazonaws.com"],
-         ['test', "neurd-datajoint.cluster-cjc6cqmcqirl.us-east-1.rds.amazonaws.com"]]
+        contents = [['connects', "jr-database.ad.bcm.edu"],
+                    #['connects-aws', "neurd-datajoint.cluster-cjc6cqmcqirl.us-east-1.rds.amazonaws.com"],
+         ['test', "jr-database.ad.bcm.edu"]]
     class Tables(dj.Part, dj.Lookup, ModularTables):                    # TODO: topological order and check for missing tables
         definition = """                                       # tables in scheme, listed in topological order and 
         -> JobScheme
@@ -43,14 +41,14 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         """
         contents = [['test', 'plumbingtest', 'Sleep', 1],
                     ['test', 'plumbingtest', 'SleepMemory', 2],
-                    ['connects', 'h01process', 'SomaExtraction', 1],
-                    ['connects', 'h01process', 'Decomposition', 2],
-                    ['connects', 'h01process', 'DecompositionCellType', 3],
-                    ['connects', 'h01process', 'AutoProofreadNeuron', 4],
-                    ['connects-aws', 'h01process', 'SomaExtraction', 1],
-                    ['connects-aws', 'h01process', 'Decomposition', 2],
-                    ['connects-aws', 'h01process', 'DecompositionCellType', 3],
-                    ['connects-aws', 'h01process', 'AutoProofreadNeuron', 4],
+                    ['connects', 'minnie35process', 'SomaExtraction', 1],
+                    ['connects', 'minnie35process', 'Decomposition', 2],
+                    ['connects', 'minnie35process', 'DecompositionCellType', 3],
+                    ['connects', 'minnie35process', 'AutoProofreadNeuron', 4],
+                    # ['connects-aws', 'minnie35process', 'SomaExtraction', 1],
+                    # ['connects-aws', 'minnie35process', 'Decomposition', 2],
+                    # ['connects-aws', 'minnie35process', 'DecompositionCellType', 3],
+                    # ['connects-aws', 'minnie35process', 'AutoProofreadNeuron', 4],
                     ]
     class Images(dj.Part, dj.Lookup):
         definition = """

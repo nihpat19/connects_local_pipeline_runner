@@ -7,7 +7,7 @@ def parse_requirements(filename):
     return [line for line in lines if line and not line.startswith('#')]
 
 setup(
-    name='connects_aws_pipeline_runner',
+    name='connects_local_pipeline_runner',
     version='0.1.0',
     packages=find_packages(),
     install_requires=parse_requirements('requirements.txt'),

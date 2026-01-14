@@ -1,6 +1,6 @@
 import datajoint as dj
 #from scalene import scalene_profiler
-schema = dj.Schema('monitoring')
+schema = dj.Schema('nihil_m35monitoring')
 import time
 
 class ResourceMonitor:

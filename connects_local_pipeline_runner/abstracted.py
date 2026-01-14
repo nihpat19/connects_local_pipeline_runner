@@ -4,7 +4,7 @@ import datajoint as dj
 from datajoint.utils import to_camel_case
 from datajoint.hash import key_hash
 from importlib import import_module
-schema = dj.Schema('abstracted')
+schema = dj.Schema('nihil_m35abstracted')
 
 
 
@@ -53,10 +53,10 @@ class Table(dj.Lookup, ModularTables):                          # TODO: module f
         """
         contents = [['sleep', "Sleep"],
                     ['sleep', "SleepMemory"],
-                    ['h01process', "SomaExtraction"], 
-              ['h01process', "Decomposition"], 
-              ['h01process', "DecompositionCellType"], 
-              ['h01process', "AutoProofreadNeuron"]]
+                    ['minnie35process', "SomaExtraction"],
+              ['minnie35process', "Decomposition"],
+              ['minnie35process', "DecompositionCellType"],
+              ['minnie35process', "AutoProofreadNeuron"]]
     def include(self, table, module):
         self.insert1(to_camel_case(table.__name__))
         self.Modular.insert1(to_camel_case(module.__name__))

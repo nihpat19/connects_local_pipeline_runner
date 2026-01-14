@@ -2,4 +2,5 @@ k8s/populate-service-credentials.yaml
 __pycache__/*
 .venv/*
 build/*
-connects_aws_pipeline_runner/__pycache__/*
+connects_local_pipeline_runner/__pycache__/*
+*/dj_local_conf.json

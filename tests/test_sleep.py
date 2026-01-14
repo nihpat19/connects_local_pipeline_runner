@@ -1,6 +1,6 @@
 import datajoint as dj
-from connects_aws_pipeline_runner.abstracted import Keys
-from connects_aws_pipeline_runner import plumbing
+from connects_local_pipeline_runner.abstracted import Keys
+from connects_local_pipeline_runner import plumbing
 import time
 slp = dj.create_virtual_module('plumbingtest', 'plumbingtest')
 

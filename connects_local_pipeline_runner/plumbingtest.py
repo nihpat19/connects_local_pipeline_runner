@@ -4,7 +4,7 @@ import datajoint as dj
 import time
 import numpy as np
 
-schema = dj.Schema('plumbingtest')
+schema = dj.Schema('nihil_m35plumbingtest')
 
 @schema
 class SleepTimes(dj.Lookup):

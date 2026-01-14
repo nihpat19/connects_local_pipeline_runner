@@ -77,12 +77,12 @@ spec:
               key: GITHUB_TOKEN
         command: ["/bin/bash"]
         args: ["-c", 
-          "git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_h01.git &&\
+          "git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_h01.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_h01:$ &&\
-          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_aws_pipeline_runner.git &&\
-          export PYTHONPATH=/home/neurd/workspace/connects_aws_pipeline_runner/connects_aws_pipeline_runner:${PYTHONPATH} &&\
+          git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_local_pipeline_runner.git &&\
+          export PYTHONPATH=/home/neurd/workspace/connects_local_pipeline_runner/connects_local_pipeline_runner:${PYTHONPATH} &&\
           echo $PYTHONPATH &&\
-          cd connects_aws_pipeline_runner &&\
+          cd connects_local_pipeline_runner &&\
           pip install . &&\
-          cd connects_aws_pipeline_runner &&\
+          cd connects_local_pipeline_runner &&\
           python3 plumbing.py"] 
