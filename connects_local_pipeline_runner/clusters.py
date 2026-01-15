@@ -92,11 +92,14 @@ class Cluster(dj.Lookup):
         return kubernetes.client.BatchV1Api(self.client)
     
     def _set_client_local(self):
-        kubernetes.config.load_kube_config()
-        configuration = kubernetes.client.Configuration.get_default_copy()
-        configuration.host = r"http://127.0.0.1:8001"
-        configuration.ssl_ca_cert = "/etc/ssl/certs/ca-certificates.crt"
-        return kubernetes.client.ApiClient(configuration=configuration)
+        #kubernetes.config.load_kube_config('/home/nihil/.kube/nihil.kubeconfig')
+        configuration = kubernetes.client.Configuration()
+        configuration.host = r"https://10.28.0.136:6443"
+        configuration.ssl_ca_cert = "/usr/local/share/ca-certificates/k8s-ca.crt"
+        configuration.cert_file = "/usr/local/share/ca-certificates/client.crt"
+        configuration.key_file = "../../client.key"
+        configuration.verify_ssl = False
+        return kubernetes.client.ApiClient(configuration)
 
 
     # def _set_client_remote(self, cluster_name, region):

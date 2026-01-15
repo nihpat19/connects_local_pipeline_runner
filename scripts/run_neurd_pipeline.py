@@ -1,9 +1,11 @@
 import datajoint as dj
-from connects_local_pipeline_runner.abstracted import Keys
-from connects_local_pipeline_runner import plumbing
+
 import sys
 import time
+sys.path.append('../../connects_local_pipeline_runner')
 
+from connects_local_pipeline_runner.abstracted import Keys
+from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrk8s')
 hp = dj.create_virtual_module('nihil_minnie35_process', 'nihil_minnie35_process')
@@ -61,7 +63,7 @@ def check_status(segment_id):
        
 def check_segments_against_jobs_table(segment_ids):
     if not isinstance(segment_ids, list):
-        segment_ids = list(segment_ids)
+        segment_ids = [segment_ids]
 
     jobs = hp.schema.jobs.fetch(as_dict = True)
     matching_jobs = []
@@ -79,4 +81,6 @@ def delete_multiple_lines(n=1):
 
 if __name__ == "__main__":
     segment_ids = [int(arg) for arg in sys.argv[1:]]
+    print(segment_ids)
+    print(type(segment_ids))
     run_segments(segment_ids)

@@ -51,8 +51,8 @@ class Table(dj.Lookup, ModularTables):                          # TODO: module f
         module_name : varchar(64)
         -> Table
         """
-        contents = [['sleep', "Sleep"],
-                    ['sleep', "SleepMemory"],
+        contents = [['plumbingtest', "Sleep"],
+                    ['plumbingtest', "SleepMemory"],
                     ['minnie35process', "SomaExtraction"],
               ['minnie35process', "Decomposition"],
               ['minnie35process', "DecompositionCellType"],

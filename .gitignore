@@ -4,3 +4,5 @@ __pycache__/*
 build/*
 connects_local_pipeline_runner/__pycache__/*
 */dj_local_conf.json
+.idea/*
+tests/__pycache__/*

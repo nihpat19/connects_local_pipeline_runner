@@ -304,9 +304,9 @@ def load_secret(cluster, verbose = False):
             body = yaml.safe_load(stream)
             api = (clusters.Cluster() & f"cluster_name = '{cluster}'").core_api
             try:
-                response = api.read_namespaced_secret('populate-service-credentials', 'default')
+                response = api.read_namespaced_secret('populate-service-credentials', 'nihil')
             except:
-                response = api.create_namespaced_secret('default', body)
+                response = api.create_namespaced_secret('nihil', body)
 
             if verbose:
                 print(response)

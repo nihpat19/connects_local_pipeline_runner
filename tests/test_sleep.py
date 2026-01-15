@@ -9,7 +9,7 @@ hashed_key = Keys().include(key)
 
 # delete keys and repopulate
 (plumbing.Jobs.JobAssignment() & hashed_key).delete(force = True)
-plumbing.Jobs().initialize('neurd-dev')
+plumbing.Jobs().initialize('jrk8s')
 (plumbing.Jobs() & 'scheme = "test"').assign(hashed_key)
 
 
