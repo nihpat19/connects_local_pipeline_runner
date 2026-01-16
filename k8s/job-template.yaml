@@ -3,6 +3,7 @@ kind: Job
 metadata:
   name: job_name # placeholder: this will be replaced with the datajoint key when executing
 spec:
+  ttlSecondsAfterFinished: 120
   parallelism: 1 # Don't want to run the same key twice in parallel
   template:
     spec:
@@ -60,21 +61,16 @@ spec:
             secretKeyRef:
               name: populate-service-credentials
               key: DJ_USER
-        - name: AWS_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: populate-service-credentials
-              key: AWS_ACCESS_KEY
-        - name: AWS_SECRET_KEY
-          valueFrom:
-            secretKeyRef:
-              name: populate-service-credentials
-              key: AWS_SECRET_KEY
         - name: GITHUB_TOKEN
           valueFrom:
             secretKeyRef:
               name: populate-service-credentials
               key: GITHUB_TOKEN
+
+        volumeMounts:
+          - name: mnt-volume
+            mountPath: /mnt/
+
         command: ["/bin/bash"]
         args: ["-c", 
           "git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_h01.git &&\
@@ -85,4 +81,9 @@ spec:
           cd connects_local_pipeline_runner &&\
           pip install . &&\
           cd connects_local_pipeline_runner &&\
-          python3 plumbing.py"] 
+          python3 plumbing.py"]
+      volumes:
+        - name: mnt-volume
+          hostPath:
+            path: /mnt
+            type: Directory

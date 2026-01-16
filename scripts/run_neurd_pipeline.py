@@ -7,23 +7,25 @@ sys.path.append('../../connects_local_pipeline_runner')
 from connects_local_pipeline_runner.abstracted import Keys
 from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
-plumbing.load_secret('jrk8s')
-hp = dj.create_virtual_module('nihil_minnie35_process', 'nihil_minnie35_process')
+plumbing.load_secret('jrK8s')
+hp = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
 
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
     keys = [{'segment_id': segment_id} for segment_id in segment_ids]
     hashed_keys = [Keys().include(key) for key in keys]
+    print(hashed_keys)
     if delete_existing_jobs:
         print('Deleting existing jobs from plumbing.Jobs.JobAssignment and from the datajoint jobs table. This does not delete kubernetes jobs in the cluster.')
         (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
         query = check_segments_against_jobs_table(segment_ids)
         print(f"Deleting {len(query)} jobs from datajoint jobs table.")
         query.delete()
-
+    plumbing.Jobs().initialize('jrK8s',scheme='connects')
     (plumbing.Jobs() & 'scheme = "connects"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
+    print(plumbing.Jobs())
     plumbing.Jobs.Launched.populate(hashed_keys)
     to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     while to_do:
@@ -81,6 +83,4 @@ def delete_multiple_lines(n=1):
 
 if __name__ == "__main__":
     segment_ids = [int(arg) for arg in sys.argv[1:]]
-    print(segment_ids)
-    print(type(segment_ids))
     run_segments(segment_ids)

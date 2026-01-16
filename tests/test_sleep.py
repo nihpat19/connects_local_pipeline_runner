@@ -1,15 +1,15 @@
 import datajoint as dj
 from connects_local_pipeline_runner.abstracted import Keys
-from connects_local_pipeline_runner import plumbing
+from connects_local_pipeline_runner import plumbing, plumbingtest
 import time
-slp = dj.create_virtual_module('plumbingtest', 'plumbingtest')
+slp = dj.create_virtual_module('plumbingtest', 'nihil_m35plumbingtest')
 
 key = {"sleep_time": 10}
 hashed_key = Keys().include(key)
 
 # delete keys and repopulate
 (plumbing.Jobs.JobAssignment() & hashed_key).delete(force = True)
-plumbing.Jobs().initialize('jrk8s')
+plumbing.Jobs().initialize('jrK8s')
 (plumbing.Jobs() & 'scheme = "test"').assign(hashed_key)
 
 

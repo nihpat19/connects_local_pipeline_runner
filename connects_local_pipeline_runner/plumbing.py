@@ -264,7 +264,9 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
     def assign(self, key):
         #kh = Keys().include(key)          # convert to abstract key
         tables = JobScheme.Tables & self
+        print(tables)
         res_model = ((Jobs & key) & ResourceModel())
+        print(res_model)
         JobGroups.populate(tables, key, res_model)
         self.JobAssignment.insert((Jobs & key) * JobGroups, ignore_extra_fields = True, skip_duplicates = True)
 
@@ -345,7 +347,7 @@ if __name__ == "__main__":
         monitor.stop()
         assignment_key = ((JobGroups & key & table) * (Jobs.JobAssignment & key)).fetch1()
         print(assignment_key)
-        Jobs.Run.insert1({**assignment_key, **site_info, 'table_name': table_name}, ignore_extra_fields = True)
-        Jobs.Stats.insert1({**assignment_key, **monitor.stats(), 'table_name': table_name}, ignore_extra_fields = True)
+        Jobs.Run.insert1({**assignment_key, **site_info, 'table_name': table_name}, ignore_extra_fields = True,skip_duplicates = True)
+        Jobs.Stats.insert1({**assignment_key, **monitor.stats(), 'table_name': table_name}, ignore_extra_fields = True,skip_duplicates = True)
     print(Jobs.Launched & key & {'resource_group': os.environ['RES_GROUP']})
     Jobs.Complete.populate(Jobs.Launched & key & {'resource_group': os.environ['RES_GROUP']})

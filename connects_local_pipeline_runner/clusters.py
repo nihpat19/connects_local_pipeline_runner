@@ -69,7 +69,7 @@ class Cluster(dj.Lookup):
     ---
     -> Region
     """
-    contents = [['jrk8s', 'bcm', 'local'],
+    contents = [['jrK8s', 'bcm', 'local'],
                 #['neurd-dev', 'aws-eks', 'us-east-1']
                 ]
 
