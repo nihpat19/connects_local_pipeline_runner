@@ -27,6 +27,7 @@ spec:
                 values: 
                 - jr-compute002
                 - jr-compute004
+                - jr-compute006
       containers:
       - name: container_name # placeholder: is programmatically replaced with value from table
         image: image_url # placeholder
