@@ -233,28 +233,6 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             else:
                 return
 
-        #     resource_groups = (Jobs.JobAssignment & key).fetch('resource_group')
-        #     tables_ready, table_names = [self._key_source_group(grp, key) for grp in resource_groups]
-        #     print(tables_ready)
-        #     keys = []
-        #     for table, grp, name in zip(tables_ready, resource_groups, table_names):
-        #         print(table)
-        #         tab_keysource = (abstracted.Table() & table).obj.key_source
-        #         print(name)
-        #         [keys.append({'table_name': name[0], 'key_hash': kh(k), 'resource_group': grp}) for k in tab_keysource.fetch('KEY')]
-        #     print(keys)
-        #     Jobs.Ready.insert(keys, skip_duplicates = True)
-        #     #[Jobs.Ready.insert({**keys, 'resource_group' : resource_group}) for keys, resource_group in zip(keys_ready, resource_groups)]
-
-        # def _key_source_group(self, resource_group, key):
-        #     # get all keys that can currently be populated for each group
-        #     # currently only tested for case where there's a single source for each group
-        #     tables = (JobGroups * JobScheme.Tables) & {'resource_group': resource_group} & key
-        #     min_index = min(tables.fetch('topological_index'))
-        #     source_tables = tables & {'topological_index': min_index}
-        #     table_names = [s['table_name'] for s in source_tables]
-        #     return source_tables, table_names
-
     def initialize(self, cluster, scheme = 'test', monitor = 'simple', resource_model = 'test'):
         self.insert1({'scheme': scheme, 'monitor_name':monitor, 'cluster_name' : cluster, 'model_name' : resource_model}, skip_duplicates = True)
         load_secret(cluster)

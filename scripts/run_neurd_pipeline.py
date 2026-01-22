@@ -8,7 +8,7 @@ from connects_local_pipeline_runner.abstracted import Keys
 from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
-hp = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
+m35p = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
 
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
@@ -56,7 +56,7 @@ def check_status(segment_id):
             status = f"{n_reserved} reserved splits; {n_errors} error splits"
     else: # check to see if completed
         key = {'segment_id': segment_id}
-        segment_query = hp.AutoProofreadNeuron & key
+        segment_query = m35p.AutoProofreadNeuron & key
         if segment_query:
             status = f"complete; {len(segment_query)} splits"
         else:
@@ -67,13 +67,13 @@ def check_segments_against_jobs_table(segment_ids):
     if not isinstance(segment_ids, list):
         segment_ids = [segment_ids]
 
-    jobs = hp.schema.jobs.fetch(as_dict = True)
+    jobs = m35p.schema.jobs.fetch(as_dict = True)
     matching_jobs = []
     for segment_id in segment_ids:
         for j in jobs:
             if j['key']['segment_id'] == segment_id:
                 matching_jobs.append({'table_name': j['table_name'], 'key_hash':j['key_hash']})
-    return hp.schema.jobs & matching_jobs
+    return m35p.schema.jobs & matching_jobs
 
 def delete_multiple_lines(n=1):
     """Delete the last line in the STDOUT."""
