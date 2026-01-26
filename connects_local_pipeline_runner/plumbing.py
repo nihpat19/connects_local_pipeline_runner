@@ -70,7 +70,7 @@ class Resources(dj.Lookup):
     gpu_limit = 0 : tinyint
     storage = 25 : int                                      # in GB
     """
-    contents = [['r6g.xlarge',100, 200, None, None, None, None],
+    contents = [['r6g.xlarge',None, None, None, None, None, None],
                 ['r6g.large', 10, 20, 0.7, 0, 0, 25]]
 
 @schema
@@ -87,7 +87,9 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             key_segment = (Keys() & key_hash).key.fetch1('segment_id')
+            print(key_segment)
             segment_filesize_in_mb = (m35d.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
+            print(segment_filesize_in_mb)
             return 'r6g.xlarge' if segment_filesize_in_mb > 50 else 'r6g.large'
 
 

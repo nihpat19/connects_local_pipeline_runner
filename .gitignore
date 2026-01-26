@@ -7,3 +7,4 @@ connects_local_pipeline_runner/__pycache__/*
 .idea/*
 tests/__pycache__/*
 scripts/*.crt
+scripts/__pycache__/*
