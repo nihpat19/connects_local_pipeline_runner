@@ -34,7 +34,7 @@ spec:
                     operator: In
                     values:
                       - low
-                    weight: 90
+          weight: 90
 #                   - key: kubernetes.io/hostname
 #                     operator: In
 #                     values:
