@@ -27,13 +27,13 @@ spec:
                 values: 
                 - jr-compute002
                 - jr-compute004
-          preferredDuringSchedulingIgnoredDuringExecution:
-            - preference:
-                matchExpressions:
-                  - key: ramtype
-                    operator: In
-                    values:
-                      - low
+#          preferredDuringSchedulingIgnoredDuringExecution:
+#            - preference:
+#                matchExpressions:
+#                  - key: ramtype
+#                    operator: In
+#                    values:
+#                      - low
 #                   - key: kubernetes.io/hostname
 #                     operator: In
 #                     values:
@@ -80,7 +80,7 @@ spec:
 #                       - at-node6
 #                       - at-node7
 #                       - at-node8
-              weight: 90
+#              weight: 90
       containers:
       - name: container_name # placeholder: is programmatically replaced with value from table
         image: image_url # placeholder

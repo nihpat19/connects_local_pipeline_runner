@@ -22,7 +22,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         query = check_segments_against_jobs_table(segment_ids)
         print(f"Deleting {len(query)} jobs from datajoint jobs table.")
         query.delete()
-    plumbing.Jobs().initialize('jrK8s',scheme='connects')
+    plumbing.Jobs().initialize('jrK8s',scheme='connects',resource_model='neurd')
     (plumbing.Jobs() & 'scheme = "connects"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     print(plumbing.Jobs())

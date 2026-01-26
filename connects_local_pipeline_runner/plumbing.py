@@ -11,7 +11,8 @@ import os
 ModularTables = abstracted.ModularTables
 Keys = abstracted.Keys
 ResourceMonitorSimple = monitoring.ResourceMonitorSimple
-
+import datajoint as dj
+m35d = dj.create_virtual_module('minnie35_download','nihil_minnie35_download')
 @schema
 class JobScheme(dj.Lookup):                                       # TODO: optimization --- make into computed table; calculate ordering, etc.
     definition = """                                           # Collection of schemas we want to populate, with optimization for parallelism
@@ -69,7 +70,7 @@ class Resources(dj.Lookup):
     gpu_limit = 0 : tinyint
     storage = 25 : int                                      # in GB
     """
-    contents = [['r6g.xlarge', None, None, None, None, None, None],
+    contents = [['r6g.xlarge', 50, 200, None, None, None, None],
                 ['r6g.large', 10, 20, 0.7, 0, 0, 25]]
 
 @schema
@@ -77,13 +78,19 @@ class ResourceModel(dj.Lookup):
     definition = """                                      # models resources to request
     model_name: varchar(32)
     """
-    contents = [['test'], ['neurd-soma-low']]
+    contents = [['test'], ['neurd-soma-low'], ['neurd']]
 
     def model(self, model, key_hash, table):
        if model == 'test':
            return 'r6g.large' if table == 'Sleep' else 'r6g.xlarge'
        if model == 'neurd-soma-low':
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
+       if model == 'neurd':
+            key_segment = (Keys() & key_hash).key.fetch1('segment_id')
+            segment_filesize_in_mb = (m35d.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
+            return 'r6g.xlarge' if segment_filesize_in_mb > 50 else 'r6g.large'
+
+
 
 
 @schema
