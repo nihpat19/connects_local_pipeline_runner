@@ -70,7 +70,7 @@ class Resources(dj.Lookup):
     gpu_limit = 0 : tinyint
     storage = 25 : int                                      # in GB
     """
-    contents = [['r6g.xlarge', 50, 200, None, None, None, None],
+    contents = [['r6g.xlarge',100, 200, None, None, None, None],
                 ['r6g.large', 10, 20, 0.7, 0, 0, 25]]
 
 @schema
@@ -148,7 +148,9 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'MY_KEY', 'value': self.fetch1('key_hash')})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'RES_GROUP', 'value': req['resource_group']})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'DJ_HOST', 'value': (JobScheme.DataBase & self).fetch1('database_url')})
-            
+            if req['resource_group']=='r6g.xlarge':
+                job['spec']['template']['spec']['affinity']['nodeAffinity']\
+                ['preferredDuringSchedulingIgnoredDuringExecution'][''] =
             return job
         
         @property

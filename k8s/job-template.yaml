@@ -27,13 +27,13 @@ spec:
                 values: 
                 - jr-compute002
                 - jr-compute004
-#          preferredDuringSchedulingIgnoredDuringExecution:
-#            - preference:
-#                matchExpressions:
-#                  - key: ramtype
-#                    operator: In
-#                    values:
-#                      - low
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - preference:
+                matchExpressions:
+                  - key: ramtype
+                    operator: In
+                    values:
+                      - low
 #                   - key: kubernetes.io/hostname
 #                     operator: In
 #                     values:
