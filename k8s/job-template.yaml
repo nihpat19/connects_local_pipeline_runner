@@ -34,54 +34,7 @@ spec:
                     operator: In
                     values:
                       - low
-          weight: 90
-#                   - key: kubernetes.io/hostname
-#                     operator: In
-#                     values:
-#                       - at-node10
-#                       - at-node11
-#                       - at-node12
-#                       - at-node13
-#                       - at-node14
-#                       - at-node15
-#                       - at-node16
-#                       - at-node17
-#                       - at-node18
-#                       - at-node19
-#                       - at-node20
-#                       - at-node21
-#                       - at-node22
-#                       - at-node23
-#                       - at-node24
-#                       - at-node25
-#                       - at-node26
-#                       - at-node29
-#                       - at-node3
-#                       - at-node30
-#                       - at-node31
-#                       - at-node32
-#                       - at-node33
-#                       - at-node34
-#                       - at-node35
-#                       - at-node36
-#                       - at-node39
-#                       - at-node4
-#                       - at-node40
-#                       - at-node41
-#                       - at-node42
-#                       - at-node43
-#                       - at-node44
-#                       - at-node45
-#                       - at-node46
-#                       - at-node47
-#                       - at-node48
-#                       - at-node49
-#                       - at-node5
-#                       - at-node50
-#                       - at-node6
-#                       - at-node7
-#                       - at-node8
-#              weight: 90
+              weight: 90
       containers:
       - name: container_name # placeholder: is programmatically replaced with value from table
         image: image_url # placeholder
