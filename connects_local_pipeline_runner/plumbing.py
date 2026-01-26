@@ -149,7 +149,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'RES_GROUP', 'value': req['resource_group']})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'DJ_HOST', 'value': (JobScheme.DataBase & self).fetch1('database_url')})
             if req['resource_group']=='r6g.xlarge':
-                template['spec']['template']['spec']['affinity']['nodeAffinity'][
+                job['spec']['template']['spec']['affinity']['nodeAffinity'][
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
             return job
