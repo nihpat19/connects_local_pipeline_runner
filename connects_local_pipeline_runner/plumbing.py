@@ -2,6 +2,9 @@ import time
 import datajoint as dj
 from datajoint.hash import key_hash as kh
 from connects_local_pipeline_runner import abstracted, monitoring, clusters
+import sys
+sys.path.append('/home/nihil/Documents/connects_h01')
+import minnie35download
 schema = dj.Schema("nihil_m35plumbing")
 
 from getpass import getuser
@@ -12,7 +15,8 @@ ModularTables = abstracted.ModularTables
 Keys = abstracted.Keys
 ResourceMonitorSimple = monitoring.ResourceMonitorSimple
 import datajoint as dj
-m35d = dj.create_virtual_module('minnie35_download','nihil_minnie35_download')
+#m35d = dj.create_virtual_module('minnie35_download','nihil_minnie35_download')
+
 @schema
 class JobScheme(dj.Lookup):                                       # TODO: optimization --- make into computed table; calculate ordering, etc.
     definition = """                                           # Collection of schemas we want to populate, with optimization for parallelism
@@ -86,9 +90,11 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd-soma-low':
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
-            key_segment = (Keys() & key_hash).key.fetch1('segment_id')
+            #print(Keys())
+            print((Keys() & f'key_hash="{key_hash}"').key)
+            key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             print(key_segment)
-            segment_filesize_in_mb = (m35d.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
+            segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
             print(segment_filesize_in_mb)
             return 'r6g.xlarge' if segment_filesize_in_mb > 50 else 'r6g.large'
 
@@ -237,13 +243,13 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             self.insert1(key)
 
         def next_jobs(self, key): # sets next job(s) after a job is complete
-            keycopy = key.copy()
-            if keycopy['resource_group'] == 'r6g.large':
-                keycopy['resource_group'] = 'r6g.xlarge' # temporary hack --- see commented lines below
-                print('pre-insert to Ready:', keycopy)
-                Jobs.Ready.insert1(keycopy, skip_duplicates = True)
-            else:
-                return
+#            keycopy = key.copy()
+            # if keycopy['resource_group'] == 'r6g.large':
+            #     keycopy['resource_group'] = 'r6g.xlarge' # temporary hack --- see commented lines below
+            #     print('pre-insert to Ready:', keycopy)
+            #     Jobs.Ready.insert1(keycopy, skip_duplicates = True)
+            # else:
+            return
 
     def initialize(self, cluster, scheme = 'test', monitor = 'simple', resource_model = 'test'):
         self.insert1({'scheme': scheme, 'monitor_name':monitor, 'cluster_name' : cluster, 'model_name' : resource_model}, skip_duplicates = True)
@@ -262,6 +268,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
 
     def prime(self):
         job1 = JobGroups & (JobScheme.Tables & "topological_index = 1" & self)
+        print(job1)
         self.Ready.insert(job1, ignore_extra_fields = True, skip_duplicates = True)
 
     def run(self):
