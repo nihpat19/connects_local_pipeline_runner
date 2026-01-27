@@ -96,7 +96,7 @@ class ResourceModel(dj.Lookup):
             print(key_segment)
             segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
             print(segment_filesize_in_mb)
-            return 'r6g.xlarge' if segment_filesize_in_mb > 50 else 'r6g.large'
+            return 'r6g.xlarge' if segment_filesize_in_mb > 2 else 'r6g.large' #Increase resource allocation if segment is larger than 2mb (Smallest segment with 2 somas)
 
 
 
