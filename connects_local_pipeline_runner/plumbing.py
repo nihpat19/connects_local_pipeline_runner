@@ -91,13 +91,19 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             #print(Keys())
-            print((Keys() & f'key_hash="{key_hash}"').key)
+            #print((Keys() & f'key_hash="{key_hash}"').key)
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            print(key_segment)
-            segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
-            print(segment_filesize_in_mb)
-            return 'r6g.xlarge' if segment_filesize_in_mb > 2 else 'r6g.large' #Increase resource allocation if segment is larger than 2mb (Smallest segment with 2 somas)
-
+            #print(key_segment)
+            soma_count = (minnie35download.SomaInfo & f'segment_id={key_segment}').fetch1('n_somas')
+            if soma_count>1:
+                segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
+                if segment_filesize_in_mb>20:
+                    return 'r6g.xlarge'
+                else:
+                    return 'r6g.large'
+            #print(segment_filesize_in_mb)
+            else:
+                return 'r6g.xlarge'
 
 
 
