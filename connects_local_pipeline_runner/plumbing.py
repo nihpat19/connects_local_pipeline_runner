@@ -96,7 +96,7 @@ class ResourceModel(dj.Lookup):
             #print(key_segment)
             soma_count = (minnie35download.SomaInfo & f'segment_id={key_segment}').fetch1('n_somas')
             if soma_count==1:
-                segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "deicmated_meshes_lod1/{key_segment}%"').fetch1('size')/1e6
+                segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "decimated_meshes_lod1/{key_segment}%"').fetch1('size')/1e6
                 if segment_filesize_in_mb>20:
                     return 'r6g.xlarge'
                 else:
