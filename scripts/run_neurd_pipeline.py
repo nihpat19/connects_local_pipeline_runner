@@ -15,7 +15,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         segment_ids = list(segment_ids)
     keys = [{'segment_id': segment_id} for segment_id in segment_ids]
     hashed_keys = [Keys().include(key) for key in keys]
-    print(hashed_keys)
+    #print(hashed_keys)
     if delete_existing_jobs:
         print('Deleting existing jobs from plumbing.Jobs.JobAssignment and from the datajoint jobs table. This does not delete kubernetes jobs in the cluster.')
         (plumbing.Jobs.JobAssignment() & hashed_keys).delete(force = True)
@@ -26,8 +26,9 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     (plumbing.Jobs() & 'scheme = "connects"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     print(plumbing.Jobs())
-    plumbing.Jobs.Launched.populate(hashed_keys)
+    plumbing.Jobs.Launched.populate(hashed_keys[:120] if len(hashed_keys) > 120 else hashed_keys)
     to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
+
     while to_do:
         n_assigned = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.JobAssignment() & hashed_keys)
         n_complete = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.Complete() & hashed_keys)
@@ -36,7 +37,9 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         n_queued = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
         print(f'Jobs progress: \n {n_assigned} assigned \n {n_queued} queued \n {n_ready} ready \n {n_launched} launched \n {n_complete} complete (including errors)')
         print("Do not exit until queue/ready is empty.")
-        plumbing.Jobs.Launched.populate(to_do)
+        if n_launched < 120:
+            print("Launching additional jobs...")
+            plumbing.Jobs.Launched.populate(to_do)
         time.sleep(20)
         delete_multiple_lines(n=7)
         to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
@@ -45,6 +48,9 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     for segment_id in segment_ids:
         status = check_status(segment_id)
         print(f'{segment_id}: {status}')
+    print('Cleaning plumbing.')
+    (plumbing.Jobs.JobAssignment & hashed_keys).delete(force=True)
+    print('Cleanup complete.')
 
 def check_status(segment_id):
     jobs_table_keys = check_segments_against_jobs_table(segment_id)
@@ -80,6 +86,8 @@ def delete_multiple_lines(n=1):
     for _ in range(n):
         sys.stdout.write("\x1b[1A")  # cursor up one line
         sys.stdout.write("\x1b[2K")  # delete the last line
+
+
 
 if __name__ == "__main__":
     segment_ids = [int(arg) for arg in sys.argv[1:]]
