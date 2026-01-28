@@ -8,7 +8,8 @@ import run_neurd_pipeline
 m35d = dj.create_virtual_module('minnie35_download','nihil_minnie35_download')
 m35p = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
 
-segments_to_proofread = ((m35d.DecimatedMesh * m35d.SomaInfo) - m35p.AutoProofreadNeuron).fetch('segment_id',order_by='n_somas')[:125]
+segments_to_proofread = ((m35d.DecimatedMesh * m35d.SomaInfo)
+                         - m35p.AutoProofreadNeuron).fetch('segment_id',order_by='n_somas')[:10]
 
 run_neurd_pipeline.run_segments(segments_to_proofread,delete_existing_jobs=True)
 

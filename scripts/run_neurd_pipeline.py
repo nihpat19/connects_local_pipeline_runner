@@ -9,7 +9,7 @@ from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 m35p = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
-
+max_num_jobs = 5
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
@@ -26,7 +26,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     (plumbing.Jobs() & 'scheme = "connects"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     print(plumbing.Jobs())
-    plumbing.Jobs.Launched.populate(hashed_keys[:120] if len(hashed_keys) > 120 else hashed_keys)
+    plumbing.Jobs.Launched.populate(hashed_keys[:max_num_jobs] if len(hashed_keys) > max_num_jobs else hashed_keys)
     to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
 
     while to_do:
@@ -37,9 +37,9 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         n_queued = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
         print(f'Jobs progress: \n {n_assigned} assigned \n {n_queued} queued \n {n_ready} ready \n {n_launched} launched \n {n_complete} complete (including errors)')
         print("Do not exit until queue/ready is empty.")
-        if n_launched < 120:
+        if n_launched < max_num_jobs:
             print("Launching additional jobs...")
-            plumbing.Jobs.Launched.populate(to_do)
+            plumbing.Jobs.Launched.populate(keys=to_do.fetch()[:(max_num_jobs - n_launched)])
         time.sleep(20)
         delete_multiple_lines(n=7)
         to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
