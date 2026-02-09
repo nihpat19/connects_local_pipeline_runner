@@ -3,11 +3,11 @@ kind: Job
 metadata:
   name: job_name # placeholder: this will be replaced with the datajoint key when executing
 spec:
-  ttlSecondsAfterFinished: 120
+  ttlSecondsAfterFinished: 180
   parallelism: 1 # Don't want to run the same key twice in parallel
   template:
     spec:
-      restartPolicy: OnFailure
+      restartPolicy: Never
       topologySpreadConstraints:
         - maxSkew: 1
           topologyKey: kubernetes.io/hostname
@@ -81,7 +81,10 @@ spec:
 
         command: ["/bin/bash"]
         args: ["-c", 
-          "git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_h01.git &&\
+          "pip install --force-reinstall --no-deps --no-cache-dir git+https://github.com/reimerlab/datasci_tools.git && \
+          pip install --force-reinstall --no-cache-dir --no-deps git+https://github.com/reimerlab/mesh_tools.git && \
+          pip install --force-reinstall --no-cache-dir --no-deps git+https://github.com/nihpat19/NEURD.git && \
+          git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_h01.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_h01:$ &&\
           git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_local_pipeline_runner.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_local_pipeline_runner/connects_local_pipeline_runner:${PYTHONPATH} &&\
