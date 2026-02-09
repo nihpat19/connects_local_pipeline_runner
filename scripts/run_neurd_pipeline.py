@@ -9,7 +9,7 @@ from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 m35p = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
-max_num_jobs = 134
+max_num_jobs = 140
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
