@@ -3,9 +3,9 @@ import datajoint as dj
 from datajoint.hash import key_hash as kh
 from connects_local_pipeline_runner import abstracted, monitoring, clusters
 import sys
-sys.path.append('/home/nihil/Documents/connects_h01')
-import minnie35download
-schema = dj.Schema("nihil_m35plumbing")
+sys.path.append('/home/nihil/Documents/connects_v1dd')
+import v1ddprocess
+schema = dj.Schema("nihil_v1plumbing")
 
 from getpass import getuser
 from importlib import import_module
@@ -46,10 +46,10 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         """
         contents = [['test', 'plumbingtest', 'Sleep', 1],
                     ['test', 'plumbingtest', 'SleepMemory', 2],
-                    ['connects', 'minnie35process', 'SomaExtraction', 1],
-                    ['connects', 'minnie35process', 'Decomposition', 2],
-                    ['connects', 'minnie35process', 'DecompositionCellType', 3],
-                    ['connects', 'minnie35process', 'AutoProofreadNeuron', 4],
+                    ['connects', 'v1ddprocess', 'SomaExtraction', 1],
+                    ['connects', 'v1ddprocess', 'Decomposition', 2],
+                    ['connects', 'v1ddprocess', 'DecompositionCellType', 3],
+                    ['connects', 'v1ddprocess', 'AutoProofreadNeuron', 4],
                     # ['connects-aws', 'minnie35process', 'SomaExtraction', 1],
                     # ['connects-aws', 'minnie35process', 'Decomposition', 2],
                     # ['connects-aws', 'minnie35process', 'DecompositionCellType', 3],
@@ -90,20 +90,12 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd-soma-low':
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
-            #print(Keys())
-            #print((Keys() & f'key_hash="{key_hash}"').key)
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            #print(key_segment)
-            soma_count = (minnie35download.SomaInfo & f'segment_id={key_segment}').fetch1('n_somas')
-            if soma_count==1:
-                segment_filesize_in_mb = (minnie35download.schema.external['decimated_meshes'] & f'filepath like "decimated_meshes_lod1/{key_segment}%"').fetch1('size')/1e6
-                if segment_filesize_in_mb>8:
-                    return 'r6g.xlarge'
-                else:
-                    return 'r6g.large'
-            #print(segment_filesize_in_mb)
-            else:
+            segment_filesize_in_mb = (v1ddprocess.schema.external['decimated_meshes'] & f'filepath like "decimated_meshes/{key_segment}%"').fetch1('size')/1e6
+            if segment_filesize_in_mb>8:
                 return 'r6g.xlarge'
+            else:
+                return 'r6g.large'
 
 
 
