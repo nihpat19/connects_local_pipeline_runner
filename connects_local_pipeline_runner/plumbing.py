@@ -4,6 +4,7 @@ from datajoint.hash import key_hash as kh
 from connects_local_pipeline_runner import abstracted, monitoring, clusters
 import sys
 sys.path.append('/home/nihil/Documents/connects_v1dd')
+import v1dddownload
 import v1ddprocess
 schema = dj.Schema("nihil_v1plumbing")
 
@@ -46,10 +47,11 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         """
         contents = [['test', 'plumbingtest', 'Sleep', 1],
                     ['test', 'plumbingtest', 'SleepMemory', 2],
-                    ['connects', 'v1ddprocess', 'SomaExtraction', 1],
-                    ['connects', 'v1ddprocess', 'Decomposition', 2],
-                    ['connects', 'v1ddprocess', 'DecompositionCellType', 3],
-                    ['connects', 'v1ddprocess', 'AutoProofreadNeuron', 4],
+                    ['connects','v1ddprocess','MeshDecimation',1],
+                    ['connects', 'v1ddprocess', 'SomaExtraction', 2],
+                    ['connects', 'v1ddprocess', 'Decomposition', 3],
+                    ['connects', 'v1ddprocess', 'DecompositionCellType', 4],
+                    ['connects', 'v1ddprocess', 'AutoProofreadNeuron', 5],
                     # ['connects-aws', 'minnie35process', 'SomaExtraction', 1],
                     # ['connects-aws', 'minnie35process', 'Decomposition', 2],
                     # ['connects-aws', 'minnie35process', 'DecompositionCellType', 3],
@@ -91,8 +93,8 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            segment_filesize_in_mb = (v1ddprocess.schema.external['decimated_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
-            if segment_filesize_in_mb>8:
+            segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "%{key_segment}%"').fetch1('size')/1e6
+            if segment_filesize_in_mb>10:
                 return 'r6g.xlarge'
             else:
                 return 'r6g.large'

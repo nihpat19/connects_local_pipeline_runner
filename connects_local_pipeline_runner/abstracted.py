@@ -41,6 +41,7 @@ class Table(dj.Lookup, ModularTables):                          # TODO: module f
         """
     contents = [['Sleep'],
                 ['SleepMemory'],
+                ["MeshDecimation"],
               ["SomaExtraction"], 
               ["Decomposition"], 
               ["DecompositionCellType"], 
@@ -53,6 +54,7 @@ class Table(dj.Lookup, ModularTables):                          # TODO: module f
         """
         contents = [['plumbingtest', "Sleep"],
                     ['plumbingtest', "SleepMemory"],
+                    ['v1ddprocess','MeshDecimation'],
                     ['v1ddprocess', "SomaExtraction"],
               ['v1ddprocess', "Decomposition"],
               ['v1ddprocess', "DecompositionCellType"],
