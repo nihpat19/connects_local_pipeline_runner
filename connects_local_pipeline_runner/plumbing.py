@@ -330,7 +330,7 @@ if __name__ == "__main__":
     resource_query = JobGroups & key & {'resource_group': os.environ['RES_GROUP']}
     unhashed_key = (Keys() & key).key
     print('key: ', str(unhashed_key))
-    tables = (JobScheme.Tables & resource_query & 'topological_index=1').fetch(as_dict = True, order_by = 'topological_index')
+    tables = (JobScheme.Tables & resource_query).fetch(as_dict = True, order_by = 'topological_index')
 
     print(f"pod at {str(site_info)} populating tables:")
     for table in tables:

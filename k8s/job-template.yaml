@@ -27,6 +27,7 @@ spec:
                 values: 
                 - jr-compute002
                 - jr-compute004
+                - at-node3
           preferredDuringSchedulingIgnoredDuringExecution:
             - preference:
                 matchExpressions:
