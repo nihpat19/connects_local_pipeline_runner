@@ -6,8 +6,8 @@ import numpy as np
 import math
 
 import run_neurd_pipeline
-v1d = dj.create_virtual_module('v1dd_download','nihil_v1dd_download')
-v1p = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
+m65d = dj.create_virtual_module('m65_download','nihil_v1dd_download')
+m65p = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
 
 segments_to_proofread = (v1d.DownloadedMesh - v1p.AutoProofreadNeuron).fetch('segment_id')
 # batch_size = 1000
