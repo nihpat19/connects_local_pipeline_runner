@@ -8,7 +8,7 @@ from connects_local_pipeline_runner.abstracted import Keys
 from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
-m65p = dj.create_virtual_module('m65_process', 'nihil_minnie65_process')
+m65p = dj.create_virtual_module('minnie65_process', 'nihil_minnie65_process')
 max_num_jobs = 140
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
