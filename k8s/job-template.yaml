@@ -92,9 +92,9 @@ spec:
           pip install --force-reinstall --no-cache-dir --no-deps git+https://github.com/nihpat19/NEURD.git && \
           pip install --no-cache-dir caveclient[cv]==5.11.0 && \
           pip install backoff && \
-          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_v1dd.git &&\
-          export PYTHONPATH=/home/neurd/workspace/connects_v1dd:$ &&\
-          git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_local_pipeline_runner.git &&\
+          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_m65_proofread.git &&\
+          export PYTHONPATH=/home/neurd/workspace/connects_minnie65_proofread:$ &&\
+          git clone -b minnie65 --single-branch https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_local_pipeline_runner.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_local_pipeline_runner/connects_local_pipeline_runner:${PYTHONPATH} &&\
           echo $PYTHONPATH &&\
           cd connects_local_pipeline_runner &&\

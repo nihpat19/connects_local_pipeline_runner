@@ -3,7 +3,7 @@ import datajoint as dj
 from datajoint.hash import key_hash as kh
 from connects_local_pipeline_runner import abstracted, monitoring, clusters
 import sys
-sys.path.append('/home/nihil/Documents/connects_m65_proofread')
+sys.path.append('/home/neurd/workspace/connects_m65_proofread')
 import minnie65download
 import minnie65process
 schema = dj.Schema("nihil_m65plumbing")

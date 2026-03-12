@@ -8,8 +8,8 @@ from connects_local_pipeline_runner.abstracted import Keys
 from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
-v1ddp = dj.create_virtual_module('m65_process', 'nihil_m65_process')
-max_num_jobs = 100
+m65p = dj.create_virtual_module('m65_process', 'nihil_minnie65_process')
+max_num_jobs = 140
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
@@ -63,7 +63,7 @@ def check_status(segment_id):
             status = f"{n_reserved} reserved splits; {n_errors} error splits"
     else: # check to see if completed
         key = {'segment_id': segment_id}
-        segment_query = v1ddp.AutoProofreadNeuron & key
+        segment_query = m65p.AutoProofreadNeuron & key
         if segment_query:
             status = f"complete; {len(segment_query)} splits"
         else:
@@ -74,13 +74,13 @@ def check_segments_against_jobs_table(segment_ids):
     if not isinstance(segment_ids, list):
         segment_ids = [segment_ids]
 
-    jobs = v1ddp.schema.jobs.fetch(as_dict = True)
+    jobs = m65p.schema.jobs.fetch(as_dict = True)
     matching_jobs = []
     for segment_id in segment_ids:
         for j in jobs:
             if j['key']['segment_id'] == segment_id:
                 matching_jobs.append({'table_name': j['table_name'], 'key_hash':j['key_hash']})
-    return v1ddp.schema.jobs & matching_jobs
+    return m65p.schema.jobs & matching_jobs
 
 def delete_multiple_lines(n=1):
     """Delete the last line in the STDOUT."""
