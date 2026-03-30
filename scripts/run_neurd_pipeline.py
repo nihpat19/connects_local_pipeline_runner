@@ -12,6 +12,22 @@ dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 v1ddp = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
 max_num_jobs = 150
+import glob
+
+stage = '/mnt/dj-stor01/v1deepdive/'
+def garbage_cleanup(segment_id):
+    files_to_delete = glob.glob(f'{stage}/{segment_id}*')
+    for file in files_to_delete:
+        os.unlink(file)
+
+def check_recently_completed_jobs_for_errors():
+    recently_completed = (plumbing.Jobs.Launched - plumbing.jobs.Complete)
+    segment_ids = (Keys & recently_completed),fetch('key')
+    for segment_id in segment_ids:
+        status=check_status(segment_id)
+        if status=="error":
+            garbage_cleanup(segment_id)
+
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
