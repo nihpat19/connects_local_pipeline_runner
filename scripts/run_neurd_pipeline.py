@@ -61,6 +61,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
             #print(to_do.fetch()[:(max_num_jobs - n_launched)])
         time.sleep(20)
         delete_multiple_lines(n=7)
+        check_recently_completed_jobs_for_errors()
         to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     
     print('Done. Checking error status.')
