@@ -3,7 +3,7 @@ kind: Job
 metadata:
   name: job_name # placeholder: this will be replaced with the datajoint key when executing
 spec:
-  ttlSecondsAfterFinished: 180
+  ttlSecondsAfterFinished: 30
   parallelism: 1 # Don't want to run the same key twice in parallel
   template:
     spec:
@@ -24,9 +24,8 @@ spec:
                 - control-plane
               - key: kubernetes.io/hostname
                 operator: NotIn
-                values: 
-                - jr-compute002
-                - jr-compute004
+                values:
+                - at-node3
           preferredDuringSchedulingIgnoredDuringExecution:
             - preference:
                 matchExpressions:
