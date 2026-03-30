@@ -13,20 +13,9 @@ plumbing.load_secret('jrK8s')
 v1ddp = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
 max_num_jobs = 150
 import glob
+import os
 
-stage = '/mnt/dj-stor01/v1deepdive/'
-def garbage_cleanup(segment_id):
-    files_to_delete = glob.glob(f'{stage}/{segment_id}*')
-    for file in files_to_delete:
-        os.unlink(file)
 
-def check_recently_completed_jobs_for_errors():
-    recently_completed = (plumbing.Jobs.Launched - plumbing.jobs.Complete)
-    segment_ids = (Keys & recently_completed),fetch('key')
-    for segment_id in segment_ids:
-        status=check_status(segment_id)
-        if status=="error":
-            garbage_cleanup(segment_id)
 
 def run_segments(segment_ids, delete_existing_jobs = True):
     if type(segment_ids) is not list:
@@ -61,7 +50,6 @@ def run_segments(segment_ids, delete_existing_jobs = True):
             #print(to_do.fetch()[:(max_num_jobs - n_launched)])
         time.sleep(20)
         delete_multiple_lines(n=7)
-        check_recently_completed_jobs_for_errors()
         to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     
     print('Done. Checking error status.')

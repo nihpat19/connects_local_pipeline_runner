@@ -16,6 +16,7 @@ ModularTables = abstracted.ModularTables
 Keys = abstracted.Keys
 ResourceMonitorSimple = monitoring.ResourceMonitorSimple
 import datajoint as dj
+import glob
 #m35d = dj.create_virtual_module('minnie35_download','nihil_minnie35_download')
 
 @schema
@@ -313,6 +314,11 @@ def load_secret(cluster, verbose = False):
         except yaml.YAMLError as exc:
             print(exc)
 
+def garbage_cleanup(segment_id):
+    files_to_delete = glob.glob(f'{v1dddownload.STAGE}/{segment_id}*')
+    if len(files_to_delete) > 0:
+        for file in files_to_delete:
+            os.unlink(file)
 
 JobScheme.Images.insert(JobScheme.Tables * clusters.Image, skip_duplicates = True, ignore_extra_fields = True)
 
@@ -348,3 +354,10 @@ if __name__ == "__main__":
         Jobs.Stats.insert1({**assignment_key, **monitor.stats(), 'table_name': table_name}, ignore_extra_fields = True,skip_duplicates = True)
     print(Jobs.Launched & key & {'resource_group': os.environ['RES_GROUP']})
     Jobs.Complete.populate(Jobs.Launched & key & {'resource_group': os.environ['RES_GROUP']})
+    print('Checking for garbage to cleanup.')
+    if type(unhashed_key)==list:
+        segment_id=unhashed_key[0]['segment_id']
+    else:
+        segment_id = unhashed_key['segment_id']
+    garbage_cleanup(segment_id)
+    print('cleanup complete.')

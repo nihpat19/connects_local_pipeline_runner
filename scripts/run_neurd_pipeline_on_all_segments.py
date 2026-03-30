@@ -12,7 +12,7 @@ v1p = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
 # decimated_segments_to_proofread = ((v1p.MeshDecimation - v1p.AutoProofreadNeuron) & 'segment_id != 864691132641863846'
 #                                    & 'segment_id != 864691132636068366' & 'segment_id != 864691132650732403').fetch('segment_id')
 #for segments in segments_to_proofread_splits:
-all_segments_to_proofread = (v1d.DownloadedMesh - v1p.AutoProofreadNeuron).fetch('segment_id')
+all_segments_to_proofread = (v1d.DownloadedMesh - v1p.SegmentBlacklist - v1p.AutoProofreadNeuron).fetch('segment_id')
 batch_size = 20000
 num_batches = math.ceil(len(all_segments_to_proofread)/batch_size)
 segments_to_proofread_splits = np.array_split(all_segments_to_proofread,num_batches)
