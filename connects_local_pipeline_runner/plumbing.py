@@ -315,7 +315,7 @@ def load_secret(cluster, verbose = False):
             print(exc)
 
 def garbage_cleanup(segment_id):
-    files_to_delete = glob.glob(f'{v1dddownload.STAGE}/{segment_id}*')
+    files_to_delete = glob.glob(f'{v1ddprocess.STAGE}/{segment_id}*')
     if len(files_to_delete) > 0:
         for file in files_to_delete:
             os.unlink(file)
