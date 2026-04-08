@@ -14,11 +14,11 @@ v1p = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
 #for segments in segments_to_proofread_splits:
 
 all_remaining_segments = ((v1d.DownloadedMesh - v1p.SegmentBlacklist - v1p.AutoProofreadNeuron)).fetch('segment_id')
-currently_running_segments = np.array([key['segment_id'] for key in (run_neurd_pipeline.check_segments_against_jobs_table(all_remaining_segments.tolist()) & 'status="reserved"').fetch('key')])
-all_segments_to_proofread = np.setdiff1d(all_remaining_segments, currently_running_segments)
-batch_size = 20000
+currently_running_and_failed_segments = np.array([key['segment_id'] for key in (run_neurd_pipeline.check_segments_against_jobs_table(all_remaining_segments.tolist())).fetch('key')])
+all_segments_to_proofread = np.setdiff1d(all_remaining_segments, currently_running_and_failed_segments)
+batch_size = 10000
 num_batches = math.ceil(len(all_segments_to_proofread)/batch_size)
 segments_to_proofread_splits = np.array_split(all_segments_to_proofread,num_batches)
 for batch in segments_to_proofread_splits:
-    run_neurd_pipeline.run_segments(batch.tolist(),delete_existing_jobs=True)
+    run_neurd_pipeline.run_segments(batch.tolist(),delete_existing_jobs=False)
 

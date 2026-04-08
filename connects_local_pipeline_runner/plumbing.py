@@ -94,7 +94,7 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "meshes/{key_segment}%"').fetch1('size')/1e6
+            segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size')/1e6
             if segment_filesize_in_mb>8:
                 return 'r6g.xlarge'
             else:
