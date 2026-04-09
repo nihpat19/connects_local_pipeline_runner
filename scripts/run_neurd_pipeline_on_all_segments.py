@@ -20,5 +20,5 @@ batch_size = 10000
 num_batches = math.ceil(len(all_segments_to_proofread)/batch_size)
 segments_to_proofread_splits = np.array_split(all_segments_to_proofread,num_batches)
 for batch in segments_to_proofread_splits:
-    run_neurd_pipeline.run_segments(batch.tolist(),delete_existing_jobs=False)
+    run_neurd_pipeline.run_segments(batch.tolist(),delete_existing_jobs=True)
 
