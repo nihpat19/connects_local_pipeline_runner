@@ -11,13 +11,14 @@ from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 v1ddp = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
-max_num_jobs = 140
+max_num_jobs = 120
 import glob
 import os
 
 
 
 def run_segments(segment_ids, delete_existing_jobs = True):
+    global max_num_jobs
     if type(segment_ids) is not list:
         segment_ids = list(segment_ids)
     keys = [{'segment_id': segment_id} for segment_id in segment_ids]
@@ -37,6 +38,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
     to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
 
     while to_do:
+        
         n_assigned = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.JobAssignment() & hashed_keys)
         n_complete = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.Complete() & hashed_keys)
         n_launched = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
@@ -44,8 +46,12 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         n_queued = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
         print(f'Jobs progress: \n {n_assigned} assigned \n {n_queued} queued \n {n_ready} ready \n {n_launched} launched \n {n_complete} complete (including errors)')
         print("Do not exit until queue/ready is empty.")
+        current_hour = time.localtime().tm_hour
+        if current_hour >= 21:
+            max_num_jobs = 140
+        elif 21 > current_hour >= 7 and max_num_jobs == 140:
+            max_num_jobs = 120
         if n_launched < max_num_jobs and n_ready>0:
-            print("Launching additional jobs...")
             plumbing.Jobs.Launched.populate(to_do,max_calls=max_num_jobs-n_launched)
             #print(to_do.fetch()[:(max_num_jobs - n_launched)])
         time.sleep(20)

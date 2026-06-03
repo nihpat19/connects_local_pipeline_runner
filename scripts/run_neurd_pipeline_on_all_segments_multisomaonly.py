@@ -5,13 +5,14 @@ import sys
 import math
 import numpy as np
 import run_neurd_pipeline
+import pandas as pd
 
-m35d = dj.create_virtual_module('minnie35_download','nihil_minnie35_download')
-m35p = dj.create_virtual_module('minnie35_process', 'nihil_minnie35_process')
-segments_to_proofread = ((m35d.SomaInfo & 'n_somas>1') - m35p.AutoProofreadNeuron - (m35p.schema.jobs & 'status="reserved"').fetch('key')).fetch('segment_id')
-# batch_size = 1000
-# num_batches = math.ceil(len(segments_to_proofread)/batch_size)
-# segments_to_proofread_splits = np.array_split(segments_to_proofread,num_batches)
-# for segments in segments_to_proofread_splits:
-run_neurd_pipeline.run_segments(segments_to_proofread,delete_existing_jobs=True)
+v1d = dj.create_virtual_module('v1dd_download','nihil_v1dd_download')
+v1p = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
+remaining_unclassified_segments = pd.read_csv('../remaining_unclassified_segments.csv',index_col=0)['segment_id'].values
+currently_running_and_failed_segments = np.array([key['segment_id'] for key in
+                                                  (run_neurd_pipeline.check_segments_against_jobs_table(remaining_unclassified_segments.tolist())).fetch('key')])
+segments_to_proofread = np.setdiff1d(remaining_unclassified_segments,currently_running_and_failed_segments)
+
+run_neurd_pipeline.run_segments(segments_to_proofread.tolist(),delete_existing_jobs=True)
 

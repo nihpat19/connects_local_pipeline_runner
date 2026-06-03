@@ -77,7 +77,8 @@ class Resources(dj.Lookup):
     gpu_limit = 0 : tinyint
     storage = 25 : int                                      # in GB
     """
-    contents = [['r6g.xlarge',None, None, None, None, None, None],
+    contents = [['r6g.xxlarge',150,250,None,None,None,None],
+                ['r6g.xlarge',None, None, None, None, None, None],
                 ['r6g.large', 10, 20, 0.7, 0, 0, 25]]
 
 @schema
@@ -95,8 +96,10 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size')/1e6
-            if segment_filesize_in_mb>7:
+            if 1000>segment_filesize_in_mb>7:
                 return 'r6g.xlarge'
+            elif segment_filesize_in_mb>1000:
+                return 'r6g.xxlarge'
             else:
                 return 'r6g.large'
 
