@@ -96,10 +96,11 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size')/1e6
-            if 1000>segment_filesize_in_mb>7:
-                return 'r6g.xlarge'
-            elif segment_filesize_in_mb>1000:
+
+            if segment_filesize_in_mb>1000:
                 return 'r6g.xxlarge'
+            elif 1000>segment_filesize_in_mb>7:
+                return 'r6g.xlarge'
             else:
                 return 'r6g.large'
 
@@ -160,7 +161,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'MY_KEY', 'value': self.fetch1('key_hash')})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'RES_GROUP', 'value': req['resource_group']})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'DJ_HOST', 'value': (JobScheme.DataBase & self).fetch1('database_url')})
-            if req['resource_group']=='r6g.xlarge':
+            if req['resource_group']=='r6g.xlarge' or req['resource_group']=='r6g.xxlarge':
                 job['spec']['template']['spec']['affinity']['nodeAffinity'][
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
