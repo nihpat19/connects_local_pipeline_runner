@@ -77,7 +77,7 @@ class Resources(dj.Lookup):
     gpu_limit = 0 : tinyint
     storage = 25 : int                                      # in GB
     """
-    contents = [['r6g.xxlarge',150,250,None,None,None,None],
+    contents = [['r6g.xxlarge',150,350,7,None,None,None],
                 ['r6g.xlarge',None, None, None, None, None, None],
                 ['r6g.large', 10, 20, 0.7, 0, 0, 25]]
 
@@ -97,9 +97,9 @@ class ResourceModel(dj.Lookup):
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size')/1e6
 
-            if segment_filesize_in_mb>1000:
+            if segment_filesize_in_mb>200:
                 return 'r6g.xxlarge'
-            elif 1000>segment_filesize_in_mb>7:
+            elif 200>segment_filesize_in_mb>7:
                 return 'r6g.xlarge'
             else:
                 return 'r6g.large'
@@ -165,6 +165,10 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
                 job['spec']['template']['spec']['affinity']['nodeAffinity'][
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
+            if req['resource_group']=='r6g.xxlarge':
+                job['spec']['template']['spec']['affinity']['nodeAffinity']
+                ['requiredDuringSchedulingIgnoredDuringExecution']['nodeSelectorTerms']
+                [0]['matchExpressions'].append({'key':'ramtype','operator':'In','values':['high']})
             return job
         
         @property

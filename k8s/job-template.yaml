@@ -23,9 +23,9 @@ spec:
                 values:
                 - control-plane
               - key: kubernetes.io/hostname
-                operator: In
+                operator: NotIn
                 values:
-                - jr-compute004
+                - at-node3
           preferredDuringSchedulingIgnoredDuringExecution:
             - preference:
                 matchExpressions:
