@@ -166,9 +166,8 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
             if req['resource_group']=='r6g.xxlarge':
-                job['spec']['template']['spec']['affinity']['nodeAffinity']
-                ['requiredDuringSchedulingIgnoredDuringExecution']['nodeSelectorTerms']
-                [0]['matchExpressions'].append({'key':'ramtype','operator':'In','values':['high']})
+                job['spec']['template']['spec']['affinity']['nodeAffinity']['requiredDuringSchedulingIgnoredDuringExecution']['nodeSelectorTerms'][0]['matchExpressions'].append({'key':'ramtype','operator':'In','values':['high']})
+
             return job
         
         @property
