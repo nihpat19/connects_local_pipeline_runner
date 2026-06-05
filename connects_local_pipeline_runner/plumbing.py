@@ -104,7 +104,7 @@ class ResourceModel(dj.Lookup):
             elif 800>segment_filesize_in_mb>500:
                 return 'r6g.3xlarge'
             elif 500>segment_filesize_in_mb>200:
-                return 'r6g.2xlarge'
+                return 'r6g.xxlarge'
             elif 200>segment_filesize_in_mb>7:
                 return 'r6g.xlarge'
             else:
@@ -167,11 +167,11 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'MY_KEY', 'value': self.fetch1('key_hash')})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'RES_GROUP', 'value': req['resource_group']})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'DJ_HOST', 'value': (JobScheme.DataBase & self).fetch1('database_url')})
-            if req['resource_group']=='r6g.xlarge' or req['resource_group']=='r6g.xxlarge':
+            if req['resource_group']=='r6g.xlarge' or req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge':
                 job['spec']['template']['spec']['affinity']['nodeAffinity'][
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
-            if req['resource_group']=='r6g.xxlarge':
+            if req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge':
                 job['spec']['template']['spec']['affinity']['nodeAffinity']['requiredDuringSchedulingIgnoredDuringExecution']['nodeSelectorTerms'][0]['matchExpressions'].append({'key':'ramtype','operator':'In','values':['high']})
 
             return job
