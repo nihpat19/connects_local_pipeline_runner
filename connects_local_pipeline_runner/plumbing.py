@@ -97,18 +97,20 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size')/1e6
-
-            if segment_filesize_in_mb>800:
-                return 'r6g.4xlarge'
-            elif 800>segment_filesize_in_mb>500:
-                return 'r6g.3xlarge'
-            elif 500>segment_filesize_in_mb>200:
+            segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
+            if (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200):
                 return 'r6g.xxlarge'
-            elif 200>segment_filesize_in_mb>7:
-                return 'r6g.xlarge'
             else:
-                return 'r6g.large'
+                if segment_filesize_in_mb>800:
+                    return 'r6g.4xlarge'
+                elif 800>segment_filesize_in_mb>500:
+                    return 'r6g.3xlarge'
+                elif 500>segment_filesize_in_mb>200:
+                    return 'r6g.xxlarge'
+                elif 200>segment_filesize_in_mb>7:
+                    return 'r6g.xlarge'
+                else:
+                    return 'r6g.large'
 
 
 
@@ -151,7 +153,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             req = (Resources * self).fetch1()
             image_name = (clusters.Image * (Jobs & self)).fetch1('name')
             image_url = (clusters.Cluster() * (Jobs & self) * clusters.Image.Repository & f"name = '{image_name}'").fetch1('url')
-
+            key_hash = self.fetch1('key_hash')
             container_name = (clusters.Image & JobScheme.Images * self).fetch1('name').replace('_', '-')
             job = load_job_template()
             job['metadata']['name'] = self.job_name
@@ -164,14 +166,15 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
             job['spec']['template']['spec']['containers'][0]['resources']['limits']['memory'] = str(req['mem_limit'])+'Gi'
             job['spec']['template']['spec']['containers'][0]['resources']['limits']['nvidia.com/gpu'] = req['gpu_limit']
             
-            job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'MY_KEY', 'value': self.fetch1('key_hash')})
+            job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'MY_KEY', 'value': key_hash})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'RES_GROUP', 'value': req['resource_group']})
             job['spec']['template']['spec']['containers'][0]['env'].append({'name': 'DJ_HOST', 'value': (JobScheme.DataBase & self).fetch1('database_url')})
             if req['resource_group']=='r6g.xlarge' or req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge':
                 job['spec']['template']['spec']['affinity']['nodeAffinity'][
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
-            if req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge':
+            key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
+            if (req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge') and (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')==0):
                 job['spec']['template']['spec']['affinity']['nodeAffinity']['requiredDuringSchedulingIgnoredDuringExecution']['nodeSelectorTerms'][0]['matchExpressions'].append({'key':'ramtype','operator':'In','values':['high']})
 
             return job
