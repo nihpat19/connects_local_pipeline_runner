@@ -100,6 +100,8 @@ class ResourceModel(dj.Lookup):
             segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
             if (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200):
                 return 'r6g.xxlarge'
+            elif (len(v1ddprocess.SomaExtraction & f'segment_id={key_segment}')>0) and ((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10):
+                return 'r6g.3xlarge'
             else:
                 if segment_filesize_in_mb>800:
                     return 'r6g.4xlarge'
@@ -173,8 +175,7 @@ class Jobs(dj.Lookup):                                          # TODO: rewrite 
                 job['spec']['template']['spec']['affinity']['nodeAffinity'][
                     'preferredDuringSchedulingIgnoredDuringExecution'][0]['preference']['matchExpressions'][0][
                     'values'][0] = 'high'
-            key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            if (req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge') and (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')==0):
+            if (req['resource_group']=='r6g.xxlarge' or req['resource_group']=='r6g.3xlarge' or req['resource_group']=='r6g.4xlarge'):
                 job['spec']['template']['spec']['affinity']['nodeAffinity']['requiredDuringSchedulingIgnoredDuringExecution']['nodeSelectorTerms'][0]['matchExpressions'].append({'key':'ramtype','operator':'In','values':['high']})
 
             return job

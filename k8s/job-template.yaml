@@ -26,6 +26,7 @@ spec:
                 operator: NotIn
                 values:
                 - at-node3
+                - jr-compute009
           preferredDuringSchedulingIgnoredDuringExecution:
             - preference:
                 matchExpressions:

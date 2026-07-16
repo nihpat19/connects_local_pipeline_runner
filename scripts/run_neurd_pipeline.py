@@ -11,7 +11,7 @@ from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 v1ddp = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
-max_num_jobs = 10
+max_num_jobs = 20
 import glob
 import os
 
