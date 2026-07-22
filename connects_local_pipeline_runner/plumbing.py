@@ -98,7 +98,7 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
-            if (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<10):
+            if (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<8):
                 return 'r6g.xxlarge'
             elif (len(v1ddprocess.SomaExtraction & f'segment_id={key_segment}')>0) and \
                   (((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
