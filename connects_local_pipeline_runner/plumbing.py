@@ -3,10 +3,10 @@ import datajoint as dj
 from datajoint.hash import key_hash as kh
 from connects_local_pipeline_runner import abstracted, monitoring, clusters
 import sys
-sys.path.append('/home/nihil/Documents/connects_v1dd')
-import v1ddprocess
-import v1dddownload
-schema = dj.Schema("nihil_v1plumbing")
+sys.path.append('/home/nihil/Documents/connects_interneuron')
+import diamondprocess
+import diamonddownload
+schema = dj.Schema("nihil_diamondplumbing")
 
 from getpass import getuser
 from importlib import import_module
@@ -36,8 +36,8 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         ---
         database_url : varchar(255)
         """
-        contents = [['connects', "jr-database.ad.bcm.edu"],
-                    #['connects-aws', "neurd-datajoint.cluster-cjc6cqmcqirl.us-east-1.rds.amazonaws.com"],
+        contents = [#['connects', "jr-database.ad.bcm.edu"],
+                    ['connects-aws', "neurd-datajoint.cluster-cjc6cqmcqirl.us-east-1.rds.amazonaws.com"],
          ['test', "jr-database.ad.bcm.edu"]]
     class Tables(dj.Part, dj.Lookup, ModularTables):                    # TODO: topological order and check for missing tables
         definition = """                                       # tables in scheme, listed in topological order and 
@@ -48,11 +48,11 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         """
         contents = [['test', 'plumbingtest', 'Sleep', 1],
                     ['test', 'plumbingtest', 'SleepMemory', 2],
-                    ['connects','v1ddprocess','MeshDecimation',1],
-                    ['connects', 'v1ddprocess', 'SomaExtraction', 2],
-                    ['connects', 'v1ddprocess', 'Decomposition', 3],
-                    ['connects', 'v1ddprocess', 'DecompositionCellType', 4],
-                    ['connects', 'v1ddprocess', 'AutoProofreadNeuron', 5],
+                    #['connects-aws','diamondprocess','MeshDecimation',1],
+                    #['connects-aws', 'diamondprocess', 'SomaExtraction', 2],
+                    ['connects-aws', 'diamondprocess', 'Decomposition', 1],
+                    ['connects-aws', 'diamondprocess', 'DecompositionCellType', 2],
+                    ['connects-aws', 'diamondprocess', 'AutoProofreadNeuron', 3],
                     # ['connects-aws', 'minnie35process', 'SomaExtraction', 1],
                     # ['connects-aws', 'minnie35process', 'Decomposition', 2],
                     # ['connects-aws', 'minnie35process', 'DecompositionCellType', 3],
@@ -97,11 +97,11 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            segment_filesize_in_mb = (v1dddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
-            if (len(v1ddprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<8):
+            segment_filesize_in_mb = (diamonddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
+            if (len(diamondprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<8):
                 return 'r6g.xxlarge'
-            elif (len(v1ddprocess.SomaExtraction & f'segment_id={key_segment}')>0) and \
-                  (((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((v1ddprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
+            elif (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0) and \
+                  (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
                 return 'r6g.3xlarge'
             else:
                 if segment_filesize_in_mb>800:
@@ -333,7 +333,7 @@ def load_secret(cluster, verbose = False):
             print(exc)
 
 def garbage_cleanup(segment_id):
-    files_to_delete = glob.glob(f'{v1ddprocess.STAGE}/{segment_id}*')
+    files_to_delete = glob.glob(f'{diamondprocess.STAGE}/{segment_id}*')
     if len(files_to_delete) > 0:
         for file in files_to_delete:
             os.unlink(file)

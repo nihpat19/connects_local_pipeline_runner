@@ -8,3 +8,4 @@ connects_local_pipeline_runner/__pycache__/*
 tests/__pycache__/*
 scripts/*.crt
 scripts/__pycache__/*
+.vscode/settings.json

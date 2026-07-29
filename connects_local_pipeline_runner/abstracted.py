@@ -4,7 +4,7 @@ import datajoint as dj
 from datajoint.utils import to_camel_case
 from datajoint.hash import key_hash
 from importlib import import_module
-schema = dj.Schema('nihil_v1abstracted')
+schema = dj.Schema('nihil_diamondabstracted')
 
 
 
@@ -41,8 +41,6 @@ class Table(dj.Lookup, ModularTables):                          # TODO: module f
         """
     contents = [['Sleep'],
                 ['SleepMemory'],
-                ['MeshDecimation'],
-              ["SomaExtraction"], 
               ["Decomposition"], 
               ["DecompositionCellType"], 
               ["AutoProofreadNeuron"]]
@@ -54,11 +52,9 @@ class Table(dj.Lookup, ModularTables):                          # TODO: module f
         """
         contents = [['plumbingtest', "Sleep"],
                     ['plumbingtest', "SleepMemory"],
-                    ['v1ddprocess',"MeshDecimation"],
-                    ['v1ddprocess', "SomaExtraction"],
-              ['v1ddprocess', "Decomposition"],
-              ['v1ddprocess', "DecompositionCellType"],
-              ['v1ddprocess', "AutoProofreadNeuron"]]
+              ['diamondprocess', "Decomposition"],
+              ['diamondprocess', "DecompositionCellType"],
+              ['diamondprocess', "AutoProofreadNeuron"]]
     def include(self, table, module):
         self.insert1(to_camel_case(table.__name__))
         self.Modular.insert1(to_camel_case(module.__name__))

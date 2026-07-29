@@ -14,7 +14,7 @@ except:
 
 import base64
 
-schema = dj.Schema('nihil_v1clusters')
+schema = dj.Schema('nihil_diamondclusters')
 
 @schema
 class ClusterManagement(dj.Lookup):

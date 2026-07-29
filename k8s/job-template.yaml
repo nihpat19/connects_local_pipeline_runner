@@ -89,9 +89,9 @@ spec:
           pip install --force-reinstall --no-cache-dir --no-deps git+https://github.com/reimerlab/mesh_tools.git && \
           pip install --force-reinstall --no-cache-dir --no-deps git+https://github.com/nihpat19/NEURD.git && \
           pip install --no-cache-dir backoff && \
-          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_v1dd.git &&\
-          export PYTHONPATH=/home/neurd/workspace/connects_v1dd:$ &&\
-          git clone https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_local_pipeline_runner.git &&\
+          git clone https://$(GITHUB_TOKEN)@github.com/reimerlab/connects_interneuron.git &&\
+          export PYTHONPATH=/home/neurd/workspace/connects_interneuron:$ &&\
+          git clone -b interneuron https://$(GITHUB_TOKEN)@github.com/nihpat19/connects_local_pipeline_runner.git &&\
           export PYTHONPATH=/home/neurd/workspace/connects_local_pipeline_runner/connects_local_pipeline_runner:${PYTHONPATH} &&\
           echo $PYTHONPATH &&\
           cd connects_local_pipeline_runner &&\
