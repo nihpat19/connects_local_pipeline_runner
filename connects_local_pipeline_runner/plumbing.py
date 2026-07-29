@@ -28,7 +28,7 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
     width : smallint                                           # largest antichain of tables that can be processed in parallel for a given base key, assuming no key splits
     """
     contents = [['connects', 4, 1],
-                #['connects-aws', 4, 1],
+                ['connects-aws', 4, 1],
                 ['test', 2, 1]]
     class DataBase(dj.Lookup, dj.Part):    
         definition = """ # Database where tables live
@@ -97,8 +97,8 @@ class ResourceModel(dj.Lookup):
            return 'r6g.large' if table == 'SomaExtraction' else 'r6g.xlarge'
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
-            segment_filesize_in_mb = (diamonddownload.schema.external['raw_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
-            if (len(diamondprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<8):
+            segment_filesize_in_mb = (diamonddownload.schema.external['decimated_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
+            if (len(diamondprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<=10):
                 return 'r6g.xxlarge'
             elif (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0) and \
                   (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):

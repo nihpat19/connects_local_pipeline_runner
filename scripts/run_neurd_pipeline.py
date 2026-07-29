@@ -10,8 +10,8 @@ from connects_local_pipeline_runner.abstracted import Keys
 from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
-v1ddp = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
-max_num_jobs = 20
+idp = dj.create_virtual_module('diamond_process', 'nihil_diamond_process')
+max_num_jobs = 140
 import glob
 import os
 
@@ -30,20 +30,20 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         query = check_segments_against_jobs_table(segment_ids)
         print(f"Deleting {len(query)} jobs from datajoint jobs table.")
         query.delete()
-    plumbing.Jobs().initialize('jrK8s',scheme='connects',resource_model='neurd')
-    (plumbing.Jobs() & 'scheme = "connects"').assign(hashed_keys)
+    plumbing.Jobs().initialize('jrK8s',scheme='connects-aws',resource_model='neurd')
+    (plumbing.Jobs() & 'scheme = "connects-aws"').assign(hashed_keys)
     (plumbing.Jobs() & hashed_keys).prime()
     print(plumbing.Jobs())
     plumbing.Jobs.Launched.populate(hashed_keys,max_calls=max_num_jobs)
-    to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
+    to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
 
     while to_do:
         
-        n_assigned = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.JobAssignment() & hashed_keys)
-        n_complete = len((plumbing.Jobs & 'scheme = "connects"') * plumbing.Jobs.Complete() & hashed_keys)
-        n_launched = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
-        n_ready = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
-        n_queued = len((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
+        n_assigned = len((plumbing.Jobs & 'scheme = "connects-aws"') * plumbing.Jobs.JobAssignment() & hashed_keys)
+        n_complete = len((plumbing.Jobs & 'scheme = "connects-aws"') * plumbing.Jobs.Complete() & hashed_keys)
+        n_launched = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
+        n_ready = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
+        n_queued = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
         print(f'Jobs progress: \n {n_assigned} assigned \n {n_queued} queued \n {n_ready} ready \n {n_launched} launched \n {n_complete} complete (including errors)')
         print("Do not exit until queue/ready is empty.")
         current_hour = time.localtime().tm_hour
@@ -57,7 +57,7 @@ def run_segments(segment_ids, delete_existing_jobs = True):
             #print(to_do.fetch()[:(max_num_jobs - n_launched)])
         time.sleep(20)
         delete_multiple_lines(n=7)
-        to_do = ((plumbing.Jobs & 'scheme = "connects"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
+        to_do = ((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.Ready() - plumbing.Jobs.Complete())) & hashed_keys
     
     print('Done. Checking error status.')
     for segment_id in segment_ids:
@@ -77,7 +77,7 @@ def check_status(segment_id):
             status = f"{n_reserved} reserved splits; {n_errors} error splits"
     else: # check to see if completed
         key = {'segment_id': segment_id}
-        segment_query = v1ddp.AutoProofreadNeuron & key
+        segment_query = idp.AutoProofreadNeuron & key
         if segment_query:
             status = f"complete; {len(segment_query)} splits"
         else:
@@ -88,13 +88,13 @@ def check_segments_against_jobs_table(segment_ids):
     if not isinstance(segment_ids, list):
         segment_ids = [segment_ids]
 
-    jobs = v1ddp.schema.jobs.fetch(as_dict = True)
+    jobs = idp.schema.jobs.fetch(as_dict = True)
     matching_jobs = []
     for segment_id in segment_ids:
         for j in jobs:
             if j['key']['segment_id'] == segment_id:
                 matching_jobs.append({'table_name': j['table_name'], 'key_hash':j['key_hash']})
-    return v1ddp.schema.jobs & matching_jobs
+    return idp.schema.jobs & matching_jobs
 
 def delete_multiple_lines(n=1):
     """Delete the last line in the STDOUT."""

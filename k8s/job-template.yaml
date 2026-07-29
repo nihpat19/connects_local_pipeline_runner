@@ -78,7 +78,16 @@ spec:
             secretKeyRef:
               name: populate-service-credentials
               key: CAVECLIENT_TOKEN
-
+        - name: AWS_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: AWS_ACCESS_KEY
+        - name: AWS_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: populate-service-credentials
+              key: AWS_SECRET_KEY
         volumeMounts:
           - name: mnt-volume
             mountPath: /mnt/
