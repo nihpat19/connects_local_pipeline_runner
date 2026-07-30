@@ -49,10 +49,10 @@ class JobScheme(dj.Lookup):                                       # TODO: optimi
         contents = [['test', 'plumbingtest', 'Sleep', 1],
                     ['test', 'plumbingtest', 'SleepMemory', 2],
                     #['connects-aws','diamondprocess','MeshDecimation',1],
-                    #['connects-aws', 'diamondprocess', 'SomaExtraction', 2],
-                    ['connects-aws', 'diamondprocess', 'Decomposition', 1],
-                    ['connects-aws', 'diamondprocess', 'DecompositionCellType', 2],
-                    ['connects-aws', 'diamondprocess', 'AutoProofreadNeuron', 3],
+                    ['connects-aws', 'diamondprocess', 'SomaExtraction', 1],
+                    ['connects-aws', 'diamondprocess', 'Decomposition', 2],
+                    ['connects-aws', 'diamondprocess', 'DecompositionCellType', 3],
+                    ['connects-aws', 'diamondprocess', 'AutoProofreadNeuron', 4],
                     # ['connects-aws', 'minnie35process', 'SomaExtraction', 1],
                     # ['connects-aws', 'minnie35process', 'Decomposition', 2],
                     # ['connects-aws', 'minnie35process', 'DecompositionCellType', 3],
@@ -98,7 +98,7 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             segment_filesize_in_mb = (diamonddownload.schema.external['decimated_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
-            if (len(diamondprocess.MeshDecimation & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<=10):
+            if (len(diamonddownload.DecimatedMesh & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<=10):
                 return 'r6g.xxlarge'
             elif (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0) and \
                   (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):

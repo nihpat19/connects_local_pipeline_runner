@@ -1,5 +1,5 @@
 import datajoint as dj
-
+dj.config.load('./dj_local_conf.json')
 import sys
 import time
 sys.path.append('../../connects_local_pipeline_runner')
@@ -8,6 +8,7 @@ from urllib3.exceptions import InsecureRequestWarning
 urllib3.disable_warnings(InsecureRequestWarning)
 from connects_local_pipeline_runner.abstracted import Keys
 from connects_local_pipeline_runner import plumbing
+
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 idp = dj.create_virtual_module('diamond_process', 'nihil_diamond_process')

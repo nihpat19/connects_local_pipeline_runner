@@ -106,6 +106,8 @@ spec:
           cd connects_local_pipeline_runner &&\
           pip install . &&\
           cd connects_local_pipeline_runner &&\
+          mkdir -p ./stage/interneuron/{soma_products,soma_faces,nucleus_faces,glia_faces,decompositions,skeletons,graph,\
+          auto_proof_meshes,auto_proof_skeletons,auto_proof_decompositions,auto_proof_graph} &&\
           python3 plumbing.py"]
       volumes:
         - name: mnt-volume
