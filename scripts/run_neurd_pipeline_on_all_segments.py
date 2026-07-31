@@ -5,21 +5,20 @@ import sys
 import numpy as np
 import math
 import run_neurd_pipeline
-v1d = dj.create_virtual_module('v1dd_download','nihil_v1dd_download')
-v1p = dj.create_virtual_module('v1dd_process', 'nihil_v1dd_process')
+ind = dj.create_virtual_module('nihil_diamond_download','nihil_diamond_download')
+inp = dj.create_virtual_module('nihil_diamond_process', 'nihil_diamond_process')
 
-# undecimated_segments = (v1d.DownloadedMesh - v1p.MeshDecimation).fetch('segment_id')
-# decimated_segments_to_proofread = ((v1p.MeshDecimation - v1p.AutoProofreadNeuron) & 'segment_id != 864691132641863846'
+# undecimated_segments = (ind.DownloadedMesh - inp.MeshDecimation).fetch('segment_id')
+# decimated_segments_to_proofread = ((inp.MeshDecimation - inp.AutoProofreadNeuron) & 'segment_id != 864691132641863846'
 #                                    & 'segment_id != 864691132636068366' & 'segment_id != 864691132650732403').fetch('segment_id')
 #for segments in segments_to_proofread_splits:
-
-all_remaining_segments = ((v1d.DownloadedMesh - v1p.SegmentBlacklist - v1p.AutoProofreadNeuron)).fetch('segment_id')
+all_segments_with_somas = np.load('./segment_ids_with_somas.npy',allow_pickle=True)
+soma_segment_dicts = [dict(segment_id=id) for id in all_segments_with_somas]
+all_remaining_segments = ((ind.DownloadedMesh - inp.SegmentBlacklist - inp.AutoProofreadNeuron) & soma_segment_dicts).fetch('segment_id')
 currently_running_and_failed_segments = np.array([key['segment_id'] for key in (run_neurd_pipeline.check_segments_against_jobs_table(all_remaining_segments.tolist())).fetch('key')])
 all_segments_to_proofread = np.setdiff1d(all_remaining_segments, currently_running_and_failed_segments)
-unaccounted_keys = np.array([864691132789491025,864691132804818790,864691132708302630,864691132787708618,
-                             864691132698273883,864691132731594460,864691132748617059,864691132990767605,
-                             864691132624532632,864691132636763633,864691132736420656])
-all_segments_to_proofread = np.setdiff1d(all_segments_to_proofread,unaccounted_keys)
+
+#all_segments_to_proofread = np.setdiff1d(all_segments_to_proofread,unaccounted_keys)
 # batch_size = 1000
 # num_batches = math.ceil(len(all_segments_to_proofread)/batch_size)
 # segments_to_proofread_splits = np.array_split(all_segments_to_proofread,num_batches)

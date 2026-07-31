@@ -12,7 +12,7 @@ from connects_local_pipeline_runner import plumbing
 dj.config['safemode'] = False # deletes without prompt
 plumbing.load_secret('jrK8s')
 idp = dj.create_virtual_module('diamond_process', 'nihil_diamond_process')
-max_num_jobs = 140
+max_num_jobs = 150
 import glob
 import os
 
@@ -47,12 +47,12 @@ def run_segments(segment_ids, delete_existing_jobs = True):
         n_queued = len((plumbing.Jobs & 'scheme = "connects-aws"') * (plumbing.Jobs.JobAssignment() - plumbing.Jobs.Ready() - plumbing.Jobs.Launched() - plumbing.Jobs.Complete()) & hashed_keys)
         print(f'Jobs progress: \n {n_assigned} assigned \n {n_queued} queued \n {n_ready} ready \n {n_launched} launched \n {n_complete} complete (including errors)')
         print("Do not exit until queue/ready is empty.")
-        current_hour = time.localtime().tm_hour
-        if max_num_jobs==120 or max_num_jobs==140:
-            if current_hour >= 21:
-                max_num_jobs = 140
-            elif 21 > current_hour >= 7 and max_num_jobs == 140:
-                max_num_jobs = 120
+        # current_hour = time.localtime().tm_hour
+        # if max_num_jobs==120 or max_num_jobs==140:
+        #     if current_hour >= 21:
+        #         max_num_jobs = 140
+        #     elif 21 > current_hour >= 7 and max_num_jobs == 140:
+        #         max_num_jobs = 120
         if n_launched < max_num_jobs and n_ready>0:
             plumbing.Jobs.Launched.populate(to_do,max_calls=max_num_jobs-n_launched)
             #print(to_do.fetch()[:(max_num_jobs - n_launched)])

@@ -100,9 +100,9 @@ class ResourceModel(dj.Lookup):
             segment_filesize_in_mb = (diamonddownload.schema.external['decimated_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
             if (len(diamonddownload.DecimatedMesh & f'segment_id={key_segment}')>0) and (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<=10):
                 return 'r6g.xxlarge'
-            elif (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0) and \
-                  (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
-                return 'r6g.3xlarge'
+            elif (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0):
+                  if (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
+                    return 'r6g.3xlarge'
             else:
                 if segment_filesize_in_mb>800:
                     return 'r6g.4xlarge'
