@@ -20,9 +20,9 @@ currently_running_and_failed_segments = np.array([key['segment_id'] for key in (
 all_segments_to_proofread = np.setdiff1d(all_remaining_segments, currently_running_and_failed_segments)
 
 #all_segments_to_proofread = np.setdiff1d(all_segments_to_proofread,unaccounted_keys)
-# batch_size = 1000
-# num_batches = math.ceil(len(all_segments_to_proofread)/batch_size)
-# segments_to_proofread_splits = np.array_split(all_segments_to_proofread,num_batches)
-# for batch in segments_to_proofread_splits:
-run_neurd_pipeline.run_segments(all_segments_to_proofread.tolist(),delete_existing_jobs=True)
+batch_size = 1000
+num_batches = math.ceil(len(all_segments_to_proofread)/batch_size)
+segments_to_proofread_splits = np.array_split(all_segments_to_proofread,num_batches)
+for batch in segments_to_proofread_splits:
+    run_neurd_pipeline.run_segments(all_segments_to_proofread.tolist(),delete_existing_jobs=True)
 
