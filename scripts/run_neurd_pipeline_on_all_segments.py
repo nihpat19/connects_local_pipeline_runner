@@ -1,4 +1,5 @@
 import datajoint as dj
+dj.config.load('./dj_local_conf.json')
 import os
 import sys
 #sys.path.append('../../connects_local_pipeline_runner')
@@ -14,7 +15,7 @@ inp = dj.create_virtual_module('nihil_diamond_process', 'nihil_diamond_process')
 #for segments in segments_to_proofread_splits:
 all_segments_with_somas = np.load('./segment_ids_with_somas.npy',allow_pickle=True)
 soma_segment_dicts = [dict(segment_id=id) for id in all_segments_with_somas]
-all_remaining_segments = ((ind.DownloadedMesh - inp.SegmentBlacklist - inp.AutoProofreadNeuron) & soma_segment_dicts).fetch('segment_id')
+all_remaining_segments = ((ind.DecimatedMesh - inp.SegmentBlacklist - inp.AutoProofreadNeuron) & soma_segment_dicts).fetch('segment_id')
 currently_running_and_failed_segments = np.array([key['segment_id'] for key in (run_neurd_pipeline.check_segments_against_jobs_table(all_remaining_segments.tolist())).fetch('key')])
 all_segments_to_proofread = np.setdiff1d(all_remaining_segments, currently_running_and_failed_segments)
 
