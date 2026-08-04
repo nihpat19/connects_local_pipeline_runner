@@ -98,22 +98,22 @@ class ResourceModel(dj.Lookup):
        if model == 'neurd':
             key_segment = (Keys() & f'key_hash="{key_hash}"').key[0]['segment_id']
             segment_filesize_in_mb = (diamonddownload.schema.external['decimated_meshes'] & f'filepath like "{key_segment}%"').fetch1('size') / 1e6
-            if (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0): 
-                if (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<=10):
-                    return 'r6g.xxlarge'
-                elif (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
-                    return 'r6g.3xlarge'
+            # if (len(diamondprocess.SomaExtraction & f'segment_id={key_segment}')>0): 
+            #     if (segment_filesize_in_mb>200) and ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')<=10):
+            #         return 'r6g.xxlarge'
+            #     elif (((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('n_somata')>10) or ((diamondprocess.SomaExtraction & f'segment_id={key_segment}').fetch1('runtime')>1000)):
+            #         return 'r6g.3xlarge'
+            # else:
+            if segment_filesize_in_mb>800:
+                return 'r6g.4xlarge'
+            elif 800>segment_filesize_in_mb>500:
+                return 'r6g.3xlarge'
+            elif 500>segment_filesize_in_mb>200:
+                return 'r6g.xxlarge'
+            elif 200>segment_filesize_in_mb>7:
+                return 'r6g.xlarge'
             else:
-                if segment_filesize_in_mb>800:
-                    return 'r6g.4xlarge'
-                elif 800>segment_filesize_in_mb>500:
-                    return 'r6g.3xlarge'
-                elif 500>segment_filesize_in_mb>200:
-                    return 'r6g.xxlarge'
-                elif 200>segment_filesize_in_mb>7:
-                    return 'r6g.xlarge'
-                else:
-                    return 'r6g.large'
+                return 'r6g.large'
 
 
 
